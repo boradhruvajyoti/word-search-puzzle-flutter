@@ -14,14 +14,14 @@ void main() {
 
     test('level 6 returns correct config', () {
       final config = LevelManager.configForLevel(6);
-      expect(config.gridSize, 10); // 4+6
-      expect(config.wordCount, 10); // 4+6
+      expect(config.gridSize, 10);  // min(4+6, 10)
+      expect(config.wordCount, 10); // min(4+6, 20)
       expect(config.timeLimit, 135); // 45+6*15
     });
 
-    test('grid size is capped at 15', () {
+    test('grid size is capped at 10', () {
       final config = LevelManager.configForLevel(50);
-      expect(config.gridSize, 15);
+      expect(config.gridSize, 10);
     });
 
     test('word count is capped at 20', () {
@@ -29,9 +29,16 @@ void main() {
       expect(config.wordCount, 20);
     });
 
-    test('time limit scales correctly for level 10', () {
-      final config = LevelManager.configForLevel(10);
-      expect(config.timeLimit, 195); // 45 + 10*15
+    test('time limit decreases for levels > 16 (phase 3)', () {
+      // Level 17: 285 - (17-16)*2 = 283
+      final config17 = LevelManager.configForLevel(17);
+      expect(config17.timeLimit, 283);
+      // Level 100: 285 - (100-16)*2 = 285 - 168 = 117
+      final config100 = LevelManager.configForLevel(100);
+      expect(config100.timeLimit, 117);
+      // Level 200: 285 - (200-16)*2 = 285 - 368 = -83 → clamped to 45
+      final config200 = LevelManager.configForLevel(200);
+      expect(config200.timeLimit, 45);
     });
 
     test('asserts on invalid level', () {

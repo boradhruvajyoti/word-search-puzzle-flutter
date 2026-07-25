@@ -5,7 +5,7 @@ class AppConstants {
   AppConstants._();
 
   // Grid
-  static const int maxGridSize = 15;
+  static const int maxGridSize = 10;
   static const int minGridSize = 5;
 
   // Animation durations

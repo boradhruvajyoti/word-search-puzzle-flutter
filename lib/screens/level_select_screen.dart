@@ -1,15 +1,18 @@
-// Screens: LevelSelectScreen — grid of level tiles
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/progress_provider.dart';
 import '../widgets/level_tile.dart';
 import 'game_screen.dart';
 
 class LevelSelectScreen extends StatelessWidget {
   const LevelSelectScreen({super.key});
 
-  static const int totalLevelsToShow = 30;
+  static const int totalLevels = 1000;
 
   @override
   Widget build(BuildContext context) {
+    final progress = context.watch<ProgressProvider>();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       appBar: AppBar(
@@ -19,29 +22,76 @@ class LevelSelectScreen extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: GridView.builder(
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 4,
-            crossAxisSpacing: 12,
-            mainAxisSpacing: 12,
-            childAspectRatio: 1,
-          ),
-          itemCount: totalLevelsToShow,
-          itemBuilder: (context, index) {
-            final level = index + 1;
-            return LevelTile(
-              level: level,
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => GameScreen(level: level),
-                ),
+      body: Column(
+        children: [
+          // Progress banner
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              decoration: BoxDecoration(
+                color: isDark
+                    ? const Color(0xFF1A1B2E)
+                    : const Color(0xFFF0F2FF),
+                borderRadius: BorderRadius.circular(14),
               ),
-            );
-          },
-        ),
+              child: Row(
+                children: [
+                  const Icon(Icons.emoji_events_rounded,
+                      color: Color(0xFFFFBE0B), size: 22),
+                  const SizedBox(width: 8),
+                  Text(
+                    '${progress.highestUnlockedLevel - 1} levels completed',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 14,
+                      color: isDark
+                          ? const Color(0xFFE8E9FF)
+                          : const Color(0xFF1A1B2E),
+                    ),
+                  ),
+                  const Spacer(),
+                  Text(
+                                        '$totalLevels total',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 13,
+                      color: isDark
+                          ? const Color(0xFF8B84FF)
+                          : const Color(0xFF6C63FF),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          // Level grid
+          Expanded(
+            child: GridView.builder(
+              padding: const EdgeInsets.fromLTRB(16, 4, 16, 20),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 5,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+                childAspectRatio: 1,
+              ),
+              itemCount: totalLevels,
+              itemBuilder: (context, index) {
+                final level = index + 1;
+                return LevelTile(
+                  level: level,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => GameScreen(level: level),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
