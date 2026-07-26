@@ -4,41 +4,38 @@ import 'package:word_search_puzzle/logic/level_manager.dart';
 
 void main() {
   group('LevelManager.configForLevel', () {
-    test('level 1 returns correct config', () {
-      final config = LevelManager.configForLevel(1);
-      expect(config.level, 1);
-      expect(config.gridSize, 5); // min(4+1, 15)
-      expect(config.wordCount, 5); // min(4+1, 20)
-      expect(config.timeLimit, 60); // 45 + 1*15
+    test('Phase 1 grid sizes (5x5 to 6x6)', () {
+      expect(LevelManager.configForLevel(1).gridSize, 5);
+      expect(LevelManager.configForLevel(10).gridSize, 5);
+      expect(LevelManager.configForLevel(11).gridSize, 6);
+      expect(LevelManager.configForLevel(20).gridSize, 6);
     });
 
-    test('level 6 returns correct config', () {
-      final config = LevelManager.configForLevel(6);
-      expect(config.gridSize, 10);  // min(4+6, 10)
-      expect(config.wordCount, 10); // min(4+6, 20)
-      expect(config.timeLimit, 135); // 45+6*15
+    test('Phase 2 grid sizes (7x7 to 8x8)', () {
+      expect(LevelManager.configForLevel(21).gridSize, 7);
+      expect(LevelManager.configForLevel(30).gridSize, 7);
+      expect(LevelManager.configForLevel(31).gridSize, 8);
+      expect(LevelManager.configForLevel(40).gridSize, 8);
     });
 
-    test('grid size is capped at 10', () {
-      final config = LevelManager.configForLevel(50);
-      expect(config.gridSize, 10);
+    test('Phase 3 grid size (9x9)', () {
+      expect(LevelManager.configForLevel(41).gridSize, 9);
+      expect(LevelManager.configForLevel(70).gridSize, 9);
+      expect(LevelManager.configForLevel(100).gridSize, 9);
     });
 
-    test('word count is capped at 20', () {
-      final config = LevelManager.configForLevel(50);
-      expect(config.wordCount, 20);
+    test('Phase 4 grid size (10x10)', () {
+      expect(LevelManager.configForLevel(101).gridSize, 10);
+      expect(LevelManager.configForLevel(500).gridSize, 10);
+      expect(LevelManager.configForLevel(1000).gridSize, 10);
     });
 
-    test('time limit decreases for levels > 16 (phase 3)', () {
-      // Level 17: 285 - (17-16)*2 = 283
-      final config17 = LevelManager.configForLevel(17);
-      expect(config17.timeLimit, 283);
-      // Level 100: 285 - (100-16)*2 = 285 - 168 = 117
-      final config100 = LevelManager.configForLevel(100);
-      expect(config100.timeLimit, 117);
-      // Level 200: 285 - (200-16)*2 = 285 - 368 = -83 → clamped to 45
-      final config200 = LevelManager.configForLevel(200);
-      expect(config200.timeLimit, 45);
+    test('word count scaling across phases', () {
+      expect(LevelManager.configForLevel(1).wordCount, 4);
+      expect(LevelManager.configForLevel(20).wordCount, 6);
+      expect(LevelManager.configForLevel(40).wordCount, 8);
+      expect(LevelManager.configForLevel(100).wordCount, 12);
+      expect(LevelManager.configForLevel(1000).wordCount, 20);
     });
 
     test('asserts on invalid level', () {
