@@ -652,6 +652,25 @@ class WordBank {
     return list;
   }
 
+  /// Returns a shuffled list of unique words pulled randomly from ALL categories,
+  /// fitting within [maxLength].
+  static List<String> randomWordsForSize(int maxLength) {
+    final Set<String> allWords = {};
+    for (final list in categories.values) {
+      for (final w in list) {
+        final upper = w.trim().toUpperCase();
+        if (upper.length >= 3 &&
+            upper.length <= maxLength &&
+            !upper.contains(' ') &&
+            !upper.contains('/')) {
+          allWords.add(upper);
+        }
+      }
+    }
+    final result = allWords.toList()..shuffle();
+    return result;
+  }
+
   /// Category name for a given level (cycles through all 20 categories).
   static String categoryForLevel(int level) {
     return categoryNames[(level - 1) % categoryNames.length];

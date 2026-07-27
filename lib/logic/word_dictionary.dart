@@ -1,7 +1,25 @@
-// Logic: WordDictionary — educational definitions for game words
+// Logic: WordDictionary — educational definitions for all words in WordBank
 import 'word_bank.dart';
 
 class WordDictionary {
+  static Map<String, String>? _wordToCategoryMap;
+
+  /// Builds a reverse map from uppercase word -> category key for all words in WordBank.categories.
+  static void _ensureMapInitialized() {
+    if (_wordToCategoryMap != null) return;
+    final map = <String, String>{};
+    for (final entry in WordBank.categories.entries) {
+      final categoryKey = entry.key;
+      for (final word in entry.value) {
+        final clean = word.trim().toUpperCase();
+        if (clean.isNotEmpty && !map.containsKey(clean)) {
+          map[clean] = categoryKey;
+        }
+      }
+    }
+    _wordToCategoryMap = map;
+  }
+
   static const Map<String, String> _customDefinitions = {
     // Animals
     'LION': 'A large tawny-colored cat that lives in prides, native to Africa and India.',
@@ -90,57 +108,68 @@ class WordDictionary {
     'OCEAN': 'A vast body of salt water that covers almost three-quarters of the Earth’s surface.',
   };
 
-  /// Returns the educational definition for a given [word] in a [categoryKey].
-  static String getDefinition(String word, String categoryKey) {
-    final uppercaseWord = word.toUpperCase();
+  /// Returns the educational definition for ANY word in WordBank (10,000+ words).
+  static String getDefinition(String word, [String? fallbackCategoryKey]) {
+    final uppercaseWord = word.trim().toUpperCase();
     if (_customDefinitions.containsKey(uppercaseWord)) {
       return _customDefinitions[uppercaseWord]!;
     }
 
+    _ensureMapInitialized();
+    final categoryKey = _wordToCategoryMap![uppercaseWord] ?? fallbackCategoryKey ?? 'general';
     final categoryName = WordBank.categoryDisplayNames[categoryKey] ?? categoryKey;
+
     switch (categoryKey) {
       case 'animals':
-        return '$uppercaseWord is an animal species belonging to the animal kingdom.';
+        return '$uppercaseWord is a species of animal or wildlife native to natural habitats.';
       case 'birds':
         return '$uppercaseWord is a species of bird known for its plumage and flight.';
       case 'sea_life':
-        return '$uppercaseWord is a marine creature inhabiting oceans or aquatic ecosystems.';
+        return '$uppercaseWord is an aquatic creature or marine species inhabiting ocean waters.';
       case 'insects':
-        return '$uppercaseWord is a small arthropod insect with a segmented body.';
+        return '$uppercaseWord is a small arthropod insect with a segmented body and legs.';
       case 'fruits':
-        return '$uppercaseWord is a edible fruit containing natural sugars and vitamins.';
+        return '$uppercaseWord is a sweet or tart edible fruit packed with vitamins and natural sugars.';
       case 'vegetables':
-        return '$uppercaseWord is a healthy plant or root vegetable cultivated for food.';
+        return '$uppercaseWord is a nutritious plant or root vegetable cultivated for food.';
       case 'countries':
-        return '$uppercaseWord is a sovereign country located on planet Earth.';
+        return '$uppercaseWord is a sovereign country and geopolitical nation located on Earth.';
       case 'cities':
-        return '$uppercaseWord is a prominent city and urban center.';
+        return '$uppercaseWord is a major city and urban municipality with economic significance.';
       case 'sports':
-        return '$uppercaseWord is a competitive sport, physical activity, or athletic game.';
+        return '$uppercaseWord is a competitive athletic sport, physical activity, or game of skill.';
       case 'colors':
-        return '$uppercaseWord is a distinctive shade or hue on the visual color spectrum.';
+        return '$uppercaseWord is a distinct color shade, hue, or pigment on the visual spectrum.';
       case 'food':
-        return '$uppercaseWord is a food, dish, or beverage enjoyed around the world.';
+        return '$uppercaseWord is a delicious dish, culinary ingredient, or beverage enjoyed around the world.';
       case 'science':
-        return '$uppercaseWord is a fundamental scientific term, concept, or element.';
+        return '$uppercaseWord is a fundamental scientific term, chemical element, or natural law.';
       case 'technology':
-        return '$uppercaseWord is a digital technology term, computing concept, or modern tool.';
+        return '$uppercaseWord is a digital technology term, computing concept, or modern software tool.';
       case 'music':
-        return '$uppercaseWord is a musical term, instrument, style, or element.';
+        return '$uppercaseWord is a musical term, instrument, rhythmic style, or composition element.';
       case 'jobs':
-        return '$uppercaseWord is a professional occupation, career, or skilled trade.';
+        return '$uppercaseWord is a professional career, occupation, or skilled trade.';
       case 'plants':
-        return '$uppercaseWord is a species of plant, tree, or flower in botany.';
+        return '$uppercaseWord is a species of plant, flower, tree, or botanical flora.';
       case 'weather':
-        return '$uppercaseWord is a meteorological phenomenon or atmospheric climate condition.';
+        return '$uppercaseWord is a meteorological event, climate condition, or atmospheric phenomenon.';
       case 'space':
-        return '$uppercaseWord is an astronomical object, planet, or cosmic phenomenon.';
+        return '$uppercaseWord is an astronomical object, planet, or cosmic phenomenon in space.';
       case 'mythology':
-        return '$uppercaseWord is a legendary figure, deity, or concept from folklore.';
+        return '$uppercaseWord is a legendary figure, deity, or mythological concept from folklore.';
       case 'health':
-        return '$uppercaseWord is an anatomical organ, health concept, or biological body term.';
+        return '$uppercaseWord is an anatomical organ, medical condition, or biological body term.';
       default:
-        return '$uppercaseWord is a featured word in the $categoryName category.';
+        return '$uppercaseWord is a featured vocabulary word in the $categoryName category.';
     }
+  }
+
+  /// Returns the category display name for any word in WordBank.
+  static String getCategoryForWord(String word) {
+    final uppercaseWord = word.trim().toUpperCase();
+    _ensureMapInitialized();
+    final catKey = _wordToCategoryMap![uppercaseWord] ?? 'general';
+    return WordBank.categoryDisplayNames[catKey] ?? catKey.toUpperCase();
   }
 }

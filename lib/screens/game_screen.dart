@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../logic/level_manager.dart';
 import '../models/game_state.dart';
 import '../providers/game_provider.dart';
 import '../providers/progress_provider.dart';
@@ -56,18 +55,9 @@ class _GameScreenState extends State<GameScreen> {
             Navigator.pop(context);
           },
         ),
-        title: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Level ${widget.level}',
-              style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18),
-            ),
-            Text(
-              LevelManager.categoryDisplay(widget.level),
-              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w500),
-            ),
-          ],
+        title: Text(
+          'Level ${widget.level}',
+          style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
         ),
         actions: [
           IconButton(

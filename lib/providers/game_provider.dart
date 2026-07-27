@@ -44,9 +44,8 @@ class GameProvider extends ChangeNotifier {
     _highlightedCells = [];
     _swipeStart = null;
 
-    final category = _config!.category;
     final availableWords =
-        WordBank.wordsForSize(_config!.gridSize, category);
+        WordBank.randomWordsForSize(_config!.gridSize);
     final selectedWords = availableWords.take(_config!.wordCount).toList();
 
     final result = GridGenerator(

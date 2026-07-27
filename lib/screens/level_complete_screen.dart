@@ -336,8 +336,8 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
                                               BorderRadius.circular(10),
                                         ),
                                         child: Text(
-                                          LevelManager.categoryDisplay(
-                                              widget.level),
+                                          WordDictionary.getCategoryForWord(
+                                              _selectedWord!),
                                           style: TextStyle(
                                             fontSize: 10,
                                             fontWeight: FontWeight.w700,
@@ -352,7 +352,7 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
                                   const SizedBox(height: 6),
                                   Text(
                                     WordDictionary.getDefinition(
-                                        _selectedWord!, config.category),
+                                        _selectedWord!),
                                     style: TextStyle(
                                       fontSize: 13,
                                       height: 1.4,
