@@ -227,12 +227,12 @@ class _GameOverScreenState extends State<GameOverScreen>
                     child: const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.replay_rounded, color: Colors.white, size: 26),
+                        Icon(Icons.ondemand_video_rounded, color: Colors.white, size: 26),
                         SizedBox(width: 10),
-                        Text('Try Again',
+                        Text('Watch Ad to Retry',
                             style: TextStyle(
                                 color: Colors.white,
-                                fontSize: 20,
+                                fontSize: 18,
                                 fontWeight: FontWeight.w800)),
                       ],
                     ),
