@@ -27,7 +27,7 @@ void main() {
 
       expect(provider.status, equals(GameStatus.playing));
       expect(provider.config, isNotNull);
-      expect(provider.targetWords.length, equals(1));
+      expect(provider.targetWords.length, equals(2));
       expect(provider.scrambledLetters.isNotEmpty, isTrue);
       expect(provider.userPlacedChars.length, equals(provider.activeTargetChars.length));
     });
