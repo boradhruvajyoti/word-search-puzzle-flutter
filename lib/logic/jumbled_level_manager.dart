@@ -4,8 +4,8 @@ import '../models/jumbled_level_config.dart';
 import 'word_bank.dart';
 
 class JumbledLevelManager {
-  /// Generates a [JumbledLevelConfig] for the given [level] (1–1000+) and [languageCode].
-  static JumbledLevelConfig configForLevel(int level, String languageCode) {
+  /// Generates a [JumbledLevelConfig] for the given [level] (1–1000+).
+  static JumbledLevelConfig configForLevel(int level, [String languageCode = 'en']) {
     assert(level >= 1, 'Level must be >= 1');
 
     final int wordCount;

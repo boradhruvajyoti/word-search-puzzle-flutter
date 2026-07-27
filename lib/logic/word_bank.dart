@@ -1,24 +1,4 @@
-// Logic: Word bank — 20 languages supported (Alphabetical)
-import 'word_banks/arabic_words.dart';
-import 'word_banks/assamese_words.dart';
-import 'word_banks/bangla_words.dart';
-import 'word_banks/chinese_words.dart';
-import 'word_banks/dutch_words.dart';
-import 'word_banks/french_words.dart';
-import 'word_banks/german_words.dart';
-import 'word_banks/gujarati_words.dart';
-import 'word_banks/hindi_words.dart';
-import 'word_banks/indonesian_words.dart';
-import 'word_banks/italian_words.dart';
-import 'word_banks/japanese_words.dart';
-import 'word_banks/korean_words.dart';
-import 'word_banks/portuguese_words.dart';
-import 'word_banks/punjabi_words.dart';
-import 'word_banks/russian_words.dart';
-import 'word_banks/spanish_words.dart';
-import 'word_banks/tamil_words.dart';
-import 'word_banks/turkish_words.dart';
-
+// Logic: Word bank — English dictionary categories
 class WordBank {
   // ── English Categories (10,000+ words) ───────────────────────────────────
   static const Map<String, List<String>> categories = {
@@ -136,56 +116,21 @@ class WordBank {
     ],
   };
 
-  // ── Multi-Language Dictionaries (Alphabetical 20 Languages) ───────────────
-  static final Map<String, List<String>> multiLangBank = {
-    'ar': ArabicWords.list,
-    'as': AssameseWords.list,
-    'bn': BanglaWords.list,
-    'zh': ChineseWords.list,
-    'nl': DutchWords.list,
-    'fr': FrenchWords.list,
-    'de': GermanWords.list,
-    'gu': GujaratiWords.list,
-    'hi': HindiWords.list,
-    'id': IndonesianWords.list,
-    'it': ItalianWords.list,
-    'ja': JapaneseWords.list,
-    'ko': KoreanWords.list,
-    'pt': PortugueseWords.list,
-    'pa': PunjabiWords.list,
-    'ru': RussianWords.list,
-    'es': SpanishWords.list,
-    'ta': TamilWords.list,
-    'tr': TurkishWords.list,
-  };
-
-  /// Returns words for a specific [languageCode] fitting within [maxLength].
-  static List<String> randomWordsForLanguage(int maxLength, String languageCode) {
-    List<String> rawList = [];
-
-    if (languageCode == 'en') {
-      final Set<String> allEnglish = {};
-      for (final list in categories.values) {
-        for (final w in list) {
-          final upper = w.trim().toUpperCase();
-          if (upper.length >= 3 &&
-              upper.length <= maxLength &&
-              !upper.contains(' ') &&
-              !upper.contains('/')) {
-            allEnglish.add(upper);
-          }
+  /// Returns English words fitting within [maxLength].
+  static List<String> randomWordsForLanguage(int maxLength, [String? languageCode]) {
+    final Set<String> allEnglish = {};
+    for (final list in categories.values) {
+      for (final w in list) {
+        final upper = w.trim().toUpperCase();
+        if (upper.length >= 3 &&
+            upper.length <= maxLength &&
+            !upper.contains(' ') &&
+            !upper.contains('/')) {
+          allEnglish.add(upper);
         }
       }
-      rawList = allEnglish.toList();
-    } else {
-      final list = multiLangBank[languageCode] ?? multiLangBank['hi']!;
-      rawList = list.where((w) {
-        final clean = w.trim();
-        final len = clean.runes.length;
-        return len >= 2 && len <= maxLength && !clean.contains(' ');
-      }).toList();
     }
-
+    final rawList = allEnglish.toList();
     rawList.shuffle();
     return rawList;
   }

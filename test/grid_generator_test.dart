@@ -92,23 +92,5 @@ void main() {
         }
       }
     });
-
-    test('non-English language grids use native alphabet filler letters and contain no English characters', () {
-      final hindiResult = GridGenerator(
-        gridSize: 6,
-        words: ['शेर', 'बाघ', 'हाथी'],
-        languageCode: 'hi',
-        random: Random(12),
-      ).generate();
-
-      final englishRegex = RegExp(r'[A-Za-z]');
-
-      for (final row in hindiResult.grid) {
-        for (final cell in row) {
-          expect(englishRegex.hasMatch(cell), isFalse,
-              reason: 'Hindi grid cell "$cell" should not contain English letters');
-        }
-      }
-    });
   });
 }
