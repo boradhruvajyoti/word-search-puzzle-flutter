@@ -1,4 +1,4 @@
-// Unit tests: AppLanguage & Multi-language WordBank
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:word_search_puzzle/models/app_language.dart';
 import 'package:word_search_puzzle/logic/word_bank.dart';
@@ -28,10 +28,10 @@ void main() {
       for (final lang in AppLanguage.languages) {
         if (lang.code == 'en') {
           final words = WordBank.randomWordsForLanguage(10, 'en');
-          print('COUNT | ${lang.name} (en): ${words.length} filtered (10,000+ total in categories)');
+          debugPrint('COUNT | ${lang.name} (en): ${words.length} filtered (10,000+ total in categories)');
         } else {
           final list = WordBank.multiLangBank[lang.code] ?? [];
-          print('COUNT | ${lang.name} (${lang.code}): ${list.length} words');
+          debugPrint('COUNT | ${lang.name} (${lang.code}): ${list.length} words');
         }
       }
     });
