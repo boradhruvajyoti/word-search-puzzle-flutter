@@ -59,20 +59,58 @@ class _HomeScreenState extends State<HomeScreen>
             // Main content
             Column(
               children: [
-                Align(
-                  alignment: Alignment.topRight,
-                  child: IconButton(
-                    icon: const Icon(Icons.settings_rounded),
-                    iconSize: 28,
-                    color: isDark
-                        ? const Color(0xFF8B84FF)
-                        : const Color(0xFF6C63FF),
-                    onPressed: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (_) => const SettingsScreen()),
-                    ),
-                    padding: const EdgeInsets.all(16),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: isDark
+                              ? const Color(0xFF1A1B2E)
+                              : const Color(0xFFFFFFFF),
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.06),
+                              blurRadius: 10,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.star_rounded,
+                                color: Color(0xFFFFBE0B), size: 22),
+                            const SizedBox(width: 6),
+                            Text(
+                              '${progress.totalStars}',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w800,
+                                color: isDark
+                                    ? const Color(0xFFE8E9FF)
+                                    : const Color(0xFF1A1B2E),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.settings_rounded),
+                        iconSize: 28,
+                        color: isDark
+                            ? const Color(0xFF8B84FF)
+                            : const Color(0xFF6C63FF),
+                        onPressed: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => const SettingsScreen()),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 const Spacer(),

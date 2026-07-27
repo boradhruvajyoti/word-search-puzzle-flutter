@@ -1,8 +1,9 @@
-// Screens: LevelCompleteScreen — shows stars, time, next level
+// Screens: LevelCompleteScreen — shows stars rewarded, total stars, time, next level
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../logic/level_manager.dart';
 import '../providers/game_provider.dart';
+import '../providers/progress_provider.dart';
 import '../widgets/star_rating.dart';
 import '../utils/extensions.dart';
 import 'game_screen.dart';
@@ -54,8 +55,10 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
   Widget build(BuildContext context) {
     final config = LevelManager.configForLevel(widget.level);
     final stars = LevelManager.starsEarned(widget.timeRemaining, config.timeLimit);
+    final progress = context.watch<ProgressProvider>();
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final nextLevel = widget.level + 1;
+    final starsRewarded = widget.timeRemaining;
 
     return Scaffold(
       body: SafeArea(
@@ -64,22 +67,22 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
           child: SlideTransition(
             position: _slideAnim,
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 32),
+              padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Spacer(),
                   // Trophy
                   Container(
-                    width: 110,
-                    height: 110,
+                    width: 100,
+                    height: 100,
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
                         colors: [Color(0xFFFFBE0B), Color(0xFFFF9E00)],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
-                      borderRadius: BorderRadius.circular(32),
+                      borderRadius: BorderRadius.circular(28),
                       boxShadow: [
                         BoxShadow(
                           color: const Color(0xFFFFBE0B).withValues(alpha: 0.4),
@@ -89,13 +92,13 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
                       ],
                     ),
                     child: const Icon(Icons.emoji_events_rounded,
-                        color: Colors.white, size: 64),
+                        color: Colors.white, size: 60),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 20),
                   Text(
                     'Level ${widget.level} Complete!',
                     style: TextStyle(
-                      fontSize: 30,
+                      fontSize: 28,
                       fontWeight: FontWeight.w800,
                       color: isDark
                           ? const Color(0xFFE8E9FF)
@@ -103,15 +106,56 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 16),
                   StarRating(stars: stars),
                   const SizedBox(height: 20),
-                  // Time info
-                  _InfoChip(
-                    label: 'Time Left',
-                    value: widget.timeRemaining.toTimerString(),
-                    icon: Icons.timer_rounded,
-                    isDark: isDark,
+                  // Rewarded Stars Badge
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFFBE0B).withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(20),
+                      border:
+                          Border.all(color: const Color(0xFFFFBE0B), width: 1.5),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.star_rounded,
+                            color: Color(0xFFFFBE0B), size: 28),
+                        const SizedBox(width: 8),
+                        Text(
+                          '+$starsRewarded Stars Earned!',
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w800,
+                            color: Color(0xFFFFBE0B),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  // Info Chips
+                  Wrap(
+                    alignment: WrapAlignment.center,
+                    spacing: 12,
+                    runSpacing: 10,
+                    children: [
+                      _InfoChip(
+                        label: 'Time Left',
+                        value: widget.timeRemaining.toTimerString(),
+                        icon: Icons.timer_rounded,
+                        isDark: isDark,
+                      ),
+                      _InfoChip(
+                        label: 'Total Stars',
+                        value: '${progress.totalStars}',
+                        icon: Icons.stars_rounded,
+                        isDark: isDark,
+                      ),
+                    ],
                   ),
                   const Spacer(),
                   // Next level button
@@ -145,7 +189,7 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
                       ),
                     ),
                   ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 24),
                 ],
               ),
             ),
@@ -172,7 +216,7 @@ class _InfoChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF242540) : const Color(0xFFF0F2FF),
         borderRadius: BorderRadius.circular(16),
@@ -180,12 +224,12 @@ class _InfoChip extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: const Color(0xFF6C63FF), size: 22),
-          const SizedBox(width: 10),
+          Icon(icon, color: const Color(0xFF6C63FF), size: 20),
+          const SizedBox(width: 8),
           Text(
             '$label: ',
             style: TextStyle(
-              fontSize: 15,
+              fontSize: 14,
               fontWeight: FontWeight.w500,
               color:
                   isDark ? const Color(0xFF8B84FF) : const Color(0xFF6C63FF),
@@ -194,7 +238,7 @@ class _InfoChip extends StatelessWidget {
           Text(
             value,
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 16,
               fontWeight: FontWeight.w800,
               color: isDark
                   ? const Color(0xFFE8E9FF)

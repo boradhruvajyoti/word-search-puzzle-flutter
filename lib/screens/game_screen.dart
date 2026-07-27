@@ -43,7 +43,7 @@ class _GameScreenState extends State<GameScreen> {
       if (game.status == GameStatus.won) {
         _handleWin(context, game);
       } else if (game.status == GameStatus.lost) {
-        _handleLoss(context);
+        _handleLoss(context, game);
       }
     });
 
@@ -143,13 +143,19 @@ class _GameScreenState extends State<GameScreen> {
     );
   }
 
-  void _handleLoss(BuildContext context) {
+  void _handleLoss(BuildContext context, GameProvider game) {
     if (_navigating) return;
     _navigating = true;
+    final timeLimit = game.config?.timeLimit ?? 0;
+    context.read<ProgressProvider>().failLevel(widget.level, timeLimit);
+
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (_) => GameOverScreen(level: widget.level),
+        builder: (_) => GameOverScreen(
+          level: widget.level,
+          timeLimit: timeLimit,
+        ),
       ),
     );
   }

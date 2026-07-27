@@ -51,15 +51,23 @@ class LevelSelectScreen extends StatelessWidget {
                     ),
                   ),
                   const Spacer(),
-                  Text(
-                                        '$totalLevels total',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 13,
-                      color: isDark
-                          ? const Color(0xFF8B84FF)
-                          : const Color(0xFF6C63FF),
-                    ),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.star_rounded,
+                          color: Color(0xFFFFBE0B), size: 18),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${progress.totalStars} Stars',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 13,
+                          color: isDark
+                              ? const Color(0xFFE8E9FF)
+                              : const Color(0xFF1A1B2E),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

@@ -1,13 +1,19 @@
-// Screens: GameOverScreen — time's up with retry option
+// Screens: GameOverScreen — time's up with retry option and star deduction info
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/game_provider.dart';
+import '../providers/progress_provider.dart';
 import 'game_screen.dart';
 
 class GameOverScreen extends StatefulWidget {
   final int level;
+  final int timeLimit;
 
-  const GameOverScreen({super.key, required this.level});
+  const GameOverScreen({
+    super.key,
+    required this.level,
+    required this.timeLimit,
+  });
 
   @override
   State<GameOverScreen> createState() => _GameOverScreenState();
@@ -50,14 +56,16 @@ class _GameOverScreenState extends State<GameOverScreen>
 
   @override
   Widget build(BuildContext context) {
+    final progress = context.watch<ProgressProvider>();
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final starsDeducted = widget.timeLimit;
 
     return Scaffold(
       body: SafeArea(
         child: FadeTransition(
           opacity: _fade,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 32),
+            padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -70,15 +78,15 @@ class _GameOverScreenState extends State<GameOverScreen>
                     child: child,
                   ),
                   child: Container(
-                    width: 110,
-                    height: 110,
+                    width: 100,
+                    height: 100,
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
                         colors: [Color(0xFFFF6B6B), Color(0xFFFF006E)],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
-                      borderRadius: BorderRadius.circular(32),
+                      borderRadius: BorderRadius.circular(28),
                       boxShadow: [
                         BoxShadow(
                           color: const Color(0xFFFF6B6B).withValues(alpha: 0.4),
@@ -88,29 +96,97 @@ class _GameOverScreenState extends State<GameOverScreen>
                       ],
                     ),
                     child: const Icon(Icons.timer_off_rounded,
-                        color: Colors.white, size: 60),
+                        color: Colors.white, size: 56),
                   ),
                 ),
-                const SizedBox(height: 28),
+                const SizedBox(height: 24),
                 Text(
                   "Time's Up!",
                   style: TextStyle(
-                    fontSize: 36,
+                    fontSize: 32,
                     fontWeight: FontWeight.w800,
                     color: isDark
                         ? const Color(0xFFFF8080)
                         : const Color(0xFFFF3B3B),
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 8),
                 Text(
                   'You ran out of time on Level ${widget.level}.',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 15,
                     color: isDark
                         ? const Color(0xFF8B84FF)
                         : const Color(0xFF6C63FF),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                // Deducted Stars Badge
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFF6B6B).withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                        color: const Color(0xFFFF6B6B), width: 1.5),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.star_half_rounded,
+                          color: Color(0xFFFF6B6B), size: 26),
+                      const SizedBox(width: 8),
+                      Text(
+                        '-$starsDeducted Stars Deducted',
+                        style: const TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w800,
+                          color: Color(0xFFFF6B6B),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 14),
+                // Total Stars Chip
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? const Color(0xFF242540)
+                        : const Color(0xFFF0F2FF),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.stars_rounded,
+                          color: Color(0xFFFFBE0B), size: 20),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Total Stars: ',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: isDark
+                              ? const Color(0xFF8B84FF)
+                              : const Color(0xFF6C63FF),
+                        ),
+                      ),
+                      Text(
+                        '${progress.totalStars}',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w800,
+                          color: isDark
+                              ? const Color(0xFFE8E9FF)
+                              : const Color(0xFF1A1B2E),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 const Spacer(),
@@ -173,7 +249,7 @@ class _GameOverScreenState extends State<GameOverScreen>
                     ),
                   ),
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 24),
               ],
             ),
           ),
