@@ -96,7 +96,10 @@ class _GameScreenState extends State<GameScreen> {
               const SizedBox(height: 8),
               // Timer bar
               const TimerBar(),
-              const SizedBox(height: 12),
+              const SizedBox(height: 8),
+              // Star reward & penalty info bar
+              const _StarInfoBar(),
+              const SizedBox(height: 10),
               // Pause overlay
               if (game.status == GameStatus.paused)
                 _PauseOverlay(onResume: game.resume)
@@ -156,6 +159,103 @@ class _GameScreenState extends State<GameScreen> {
           level: widget.level,
           timeLimit: timeLimit,
         ),
+      ),
+    );
+  }
+}
+
+class _StarInfoBar extends StatelessWidget {
+  const _StarInfoBar();
+
+  @override
+  Widget build(BuildContext context) {
+    final game = context.watch<GameProvider>();
+    final progress = context.watch<ProgressProvider>();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final reward = game.timeRemaining;
+    final penalty = game.config?.timeLimit ?? 0;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1A1B2E) : const Color(0xFFFFFFFF),
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          // Win Reward
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.star_rounded, color: Color(0xFF06D6A0), size: 18),
+              const SizedBox(width: 4),
+              Text(
+                '+$reward',
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w800,
+                  color: Color(0xFF06D6A0),
+                ),
+              ),
+              const SizedBox(width: 2),
+              Text(
+                'on win',
+                style: TextStyle(
+                  fontSize: 11,
+                  color: isDark ? Colors.white54 : Colors.black45,
+                ),
+              ),
+            ],
+          ),
+          // Total Stars
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.stars_rounded, color: Color(0xFFFFBE0B), size: 18),
+              const SizedBox(width: 4),
+              Text(
+                '${progress.totalStars}',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w800,
+                  color: isDark ? const Color(0xFFE8E9FF) : const Color(0xFF1A1B2E),
+                ),
+              ),
+            ],
+          ),
+          // Fail Penalty
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'on loss',
+                style: TextStyle(
+                  fontSize: 11,
+                  color: isDark ? Colors.white54 : Colors.black45,
+                ),
+              ),
+              const SizedBox(width: 2),
+              Text(
+                '-$penalty',
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w800,
+                  color: Color(0xFFFF6B6B),
+                ),
+              ),
+              const SizedBox(width: 4),
+              const Icon(Icons.star_half_rounded, color: Color(0xFFFF6B6B), size: 18),
+            ],
+          ),
+        ],
       ),
     );
   }
