@@ -131,6 +131,7 @@ class _GameScreenState extends State<GameScreen> {
     _navigating = true;
     final timeRemaining = game.timeRemaining;
     final level = widget.level;
+    final words = game.words.map((w) => w.word).toList();
     context
         .read<ProgressProvider>()
         .completeLevel(level, timeRemaining);
@@ -141,6 +142,7 @@ class _GameScreenState extends State<GameScreen> {
         builder: (_) => LevelCompleteScreen(
           level: level,
           timeRemaining: timeRemaining,
+          completedWords: words,
         ),
       ),
     );

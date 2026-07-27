@@ -1,7 +1,8 @@
-// Screens: LevelCompleteScreen — shows stars rewarded, total stars, time, next level
+// Screens: LevelCompleteScreen — shows stars rewarded, word meanings educational section, next level
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../logic/level_manager.dart';
+import '../logic/word_dictionary.dart';
 import '../providers/game_provider.dart';
 import '../providers/progress_provider.dart';
 import '../widgets/star_rating.dart';
@@ -11,11 +12,13 @@ import 'game_screen.dart';
 class LevelCompleteScreen extends StatefulWidget {
   final int level;
   final int timeRemaining;
+  final List<String> completedWords;
 
   const LevelCompleteScreen({
     super.key,
     required this.level,
     required this.timeRemaining,
+    this.completedWords = const [],
   });
 
   @override
@@ -27,6 +30,7 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
   late AnimationController _controller;
   late Animation<double> _fadeSlideFade;
   late Animation<Offset> _slideAnim;
+  String? _selectedWord;
 
   @override
   void initState() {
@@ -43,6 +47,11 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
       CurvedAnimation(parent: _controller, curve: Curves.easeOut),
     );
     _controller.forward();
+
+    // Auto-select first word for immediate educational value
+    if (widget.completedWords.isNotEmpty) {
+      _selectedWord = widget.completedWords.first;
+    }
   }
 
   @override
@@ -66,39 +75,38 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
           opacity: _fadeSlideFade,
           child: SlideTransition(
             position: _slideAnim,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Spacer(),
+                  const SizedBox(height: 12),
                   // Trophy
                   Container(
-                    width: 100,
-                    height: 100,
+                    width: 90,
+                    height: 90,
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
                         colors: [Color(0xFFFFBE0B), Color(0xFFFF9E00)],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
-                      borderRadius: BorderRadius.circular(28),
+                      borderRadius: BorderRadius.circular(24),
                       boxShadow: [
                         BoxShadow(
                           color: const Color(0xFFFFBE0B).withValues(alpha: 0.4),
-                          blurRadius: 24,
-                          offset: const Offset(0, 8),
+                          blurRadius: 20,
+                          offset: const Offset(0, 6),
                         ),
                       ],
                     ),
                     child: const Icon(Icons.emoji_events_rounded,
-                        color: Colors.white, size: 60),
+                        color: Colors.white, size: 52),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 16),
                   Text(
                     'Level ${widget.level} Complete!',
                     style: TextStyle(
-                      fontSize: 28,
+                      fontSize: 26,
                       fontWeight: FontWeight.w800,
                       color: isDark
                           ? const Color(0xFFE8E9FF)
@@ -106,13 +114,13 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
                   StarRating(stars: stars),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 16),
                   // Rewarded Stars Badge
                   Container(
                     padding:
-                        const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
                     decoration: BoxDecoration(
                       color: const Color(0xFFFFBE0B).withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(20),
@@ -123,12 +131,12 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         const Icon(Icons.star_rounded,
-                            color: Color(0xFFFFBE0B), size: 28),
-                        const SizedBox(width: 8),
+                            color: Color(0xFFFFBE0B), size: 24),
+                        const SizedBox(width: 6),
                         Text(
                           '+$starsRewarded Stars Earned!',
                           style: const TextStyle(
-                            fontSize: 18,
+                            fontSize: 16,
                             fontWeight: FontWeight.w800,
                             color: Color(0xFFFFBE0B),
                           ),
@@ -136,12 +144,12 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
                       ],
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  // Info Chips
+                  const SizedBox(height: 12),
+                  // Info Chips (Time Left & Total Stars)
                   Wrap(
                     alignment: WrapAlignment.center,
-                    spacing: 12,
-                    runSpacing: 10,
+                    spacing: 10,
+                    runSpacing: 8,
                     children: [
                       _InfoChip(
                         label: 'Time Left',
@@ -157,7 +165,211 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
                       ),
                     ],
                   ),
-                  const Spacer(),
+                  const SizedBox(height: 20),
+
+                  // ── Educational Word Meaning Section ───────────────────────
+                  if (widget.completedWords.isNotEmpty) ...[
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? const Color(0xFF1A1B2E)
+                            : const Color(0xFFFFFFFF),
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.06),
+                            blurRadius: 14,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                        border: Border.all(
+                          color: isDark
+                              ? const Color(0xFF242540)
+                              : const Color(0xFFE8EAFF),
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(Icons.lightbulb_rounded,
+                                  color: Color(0xFFFFBE0B), size: 20),
+                              const SizedBox(width: 6),
+                              Text(
+                                'Word Meanings',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                  color: isDark
+                                      ? const Color(0xFFE8E9FF)
+                                      : const Color(0xFF1A1B2E),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Tap any word below to learn its definition:',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: isDark
+                                  ? const Color(0xFF8B84FF)
+                                  : const Color(0xFF6C63FF),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          // Word Chips Wrap
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 6,
+                            children: widget.completedWords.map((word) {
+                              final isSelected = _selectedWord == word;
+                              return GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    _selectedWord = word;
+                                  });
+                                },
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 200),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 12, vertical: 6),
+                                  decoration: BoxDecoration(
+                                    color: isSelected
+                                        ? (isDark
+                                            ? const Color(0xFF8B84FF)
+                                                .withValues(alpha: 0.3)
+                                            : const Color(0xFF6C63FF)
+                                                .withValues(alpha: 0.15))
+                                        : (isDark
+                                            ? const Color(0xFF242540)
+                                            : const Color(0xFFF0F2FF)),
+                                    borderRadius: BorderRadius.circular(16),
+                                    border: Border.all(
+                                      color: isSelected
+                                          ? (isDark
+                                              ? const Color(0xFF8B84FF)
+                                              : const Color(0xFF6C63FF))
+                                          : Colors.transparent,
+                                      width: 1.5,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        word,
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: isSelected
+                                              ? FontWeight.w800
+                                              : FontWeight.w600,
+                                          color: isSelected
+                                              ? (isDark
+                                                  ? const Color(0xFF8B84FF)
+                                                  : const Color(0xFF6C63FF))
+                                              : (isDark
+                                                  ? const Color(0xFFE8E9FF)
+                                                  : const Color(0xFF1A1B2E)),
+                                        ),
+                                      ),
+                                      if (isSelected) ...[
+                                        const SizedBox(width: 4),
+                                        Icon(
+                                          Icons.menu_book_rounded,
+                                          size: 14,
+                                          color: isDark
+                                              ? const Color(0xFF8B84FF)
+                                              : const Color(0xFF6C63FF),
+                                        ),
+                                      ],
+                                    ],
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                          const SizedBox(height: 14),
+                          // Definition Display Card
+                          if (_selectedWord != null)
+                            AnimatedContainer(
+                              duration: const Duration(milliseconds: 250),
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: isDark
+                                    ? const Color(0xFF242540)
+                                    : const Color(0xFFF8F9FF),
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(
+                                  color: isDark
+                                      ? const Color(0xFF323356)
+                                      : const Color(0xFFE0E3F5),
+                                ),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Text(
+                                        _selectedWord!,
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w800,
+                                          color: isDark
+                                              ? const Color(0xFF00E5BE)
+                                              : const Color(0xFF00C9A7),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8, vertical: 2),
+                                        decoration: BoxDecoration(
+                                          color: (isDark
+                                                  ? const Color(0xFF8B84FF)
+                                                  : const Color(0xFF6C63FF))
+                                              .withValues(alpha: 0.15),
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                        child: Text(
+                                          LevelManager.categoryDisplay(
+                                              widget.level),
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.w700,
+                                            color: isDark
+                                                ? const Color(0xFF8B84FF)
+                                                : const Color(0xFF6C63FF),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    WordDictionary.getDefinition(
+                                        _selectedWord!, config.category),
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      height: 1.4,
+                                      color: isDark
+                                          ? const Color(0xFFE8E9FF)
+                                          : const Color(0xFF333448),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ],
+
+                  const SizedBox(height: 20),
                   // Next level button
                   _GradientButton(
                     label: 'Next Level',
@@ -171,7 +383,7 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
                       );
                     },
                   ),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 10),
                   TextButton(
                     onPressed: () {
                       context.read<GameProvider>().reset();
@@ -189,7 +401,7 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
                       ),
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 16),
                 ],
               ),
             ),
@@ -216,7 +428,7 @@ class _InfoChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF242540) : const Color(0xFFF0F2FF),
         borderRadius: BorderRadius.circular(16),
@@ -224,12 +436,12 @@ class _InfoChip extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: const Color(0xFF6C63FF), size: 20),
-          const SizedBox(width: 8),
+          Icon(icon, color: const Color(0xFF6C63FF), size: 18),
+          const SizedBox(width: 6),
           Text(
             '$label: ',
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 13,
               fontWeight: FontWeight.w500,
               color:
                   isDark ? const Color(0xFF8B84FF) : const Color(0xFF6C63FF),
@@ -238,7 +450,7 @@ class _InfoChip extends StatelessWidget {
           Text(
             value,
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 15,
               fontWeight: FontWeight.w800,
               color: isDark
                   ? const Color(0xFFE8E9FF)
@@ -264,7 +476,7 @@ class _GradientButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        height: 60,
+        height: 56,
         decoration: BoxDecoration(
           gradient: const LinearGradient(
             colors: [Color(0xFF6C63FF), Color(0xFF00C9A7)],
@@ -286,10 +498,10 @@ class _GradientButton extends StatelessWidget {
             Text(label,
                 style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 20,
+                    fontSize: 18,
                     fontWeight: FontWeight.w800)),
             const SizedBox(width: 10),
-            Icon(icon, color: Colors.white, size: 26),
+            Icon(icon, color: Colors.white, size: 24),
           ],
         ),
       ),
