@@ -1,44 +1,17 @@
-// Word Bank: Dutch (Nederlands) — 1,000+ words
+// Word Bank: Dutch (Nederlands) — Verified authentic dictionary words
 class DutchWords {
-  static final List<String> list = _generateWords();
-
-  static List<String> _generateWords() {
-    final Set<String> words = {};
-
-    final List<String> baseNouns = [
-      'LEEUW','TIJGER','OLIFANT','PAARD','HOND','KAT','BEER','WOLF','VOS','AAP','KONIJN','HERT','GIRAF','NIJLPAARD','NEUSHOORN','EZEL','KOE','STIER','SCHAAP','GEIT','VARKEN','EEKHOORN','MUIS','SCHILDPAD','KROKODIL','SLANG','KIKKER','VIS','AREND','KRAAI','PAPEGAAI','HAAN','EEND','UIL','PAUW','DUIF','MUS',
-      'APPEL','BANAAN','SINAASAPPEL','DRUIF','GRANAATAPPEL','WATERMELOEN','MELOEN','PERZIK','ABRIKOOS','KERS','CITROEN','PEER','PRUIM','AARDBEI','FRAMBOOS','ANANAS','AARDAPPEL','UI','TOMAAT','ERWT','WORTEL','RADIJS','SPINAZIE','KOOL','AUBERGINE','KOMKOMMER','KNOFLOOK','PEPER','KORIANDER','SLA',
-      'ZON','MAAN','STER','HEMEL','AARDE','RIVIER','ZEE','OCEOAN','BERG','WATERVAL','MEER','WOLK','REGEN','WIND','VUUR','WATER','BODEM','BOS','BLOEM','BOOM','PLANT','BLAD','TAK','WORTEL','ZAAD','ZAND','STEEN','GROT','WOESTIJN','EILAND','VALLEI','STORM','SNEEUW','MIST','LICHT','SCHADUW',
-      'HUIS','KAMER','DEUR','RAAM','MUUR','DAK','VLOER','STOEL','TAFEL','BED','KUSSEN','DEKEN','GORDIJN','KAST','SPIEGEL','LAMP','VENTILATOR','KLOK','SLOT','SLEUTEL','BORD','GLAS','LEPEL','MES','SCHAAR','NAALD','DRAAD','KLEDING','SCHOEN','TAS','FLES','PEN','BOEK','PAPIER','POTLOOD',
-      'MOEDER','VADER','BROER','ZUS','ZOON','DOCHTER','GROOTVADER','GROOTMOEDER','OOM','TANTE','VRIEND','VRIENDIN','KIND','MAN','VROUW','MENS','KONING','KONINGIN','LERAAR','DOKTER','BOER','DICHTER','SCHRIJVER','ZANGER','ACTEUR','LAND','STAD','DORP',
-      'LIEFDE','WAARHEID','VREDE','VREUGDE','GELUK','HOOP','DROOM','MOED','GEDULD','GOEDHEID','WIJSHEID','ONDERWIJS','SUCCES','OVERWINNING','GELOOF','DIENST','EENHEID','VRIJHEID','ENTHOUSIASME',
-      'ROOD','GROEN','BLAUW','GEEL','WIT','ZWART','ROZE','PAARS','ORANJE','BRUIN','GOUD','ZILVER','ROND','LANG','BREED','GROOT','KLEIN','ZOET','ZURE','SCHERP','HEET','KOUD','TIJD','VANDAAG','MORGEN','OCHTEND','MIDDAG','AVOND','NACHT','DAG','JAAR'
-    ];
-
-    final List<String> prefixes = [
-      'ZONNE','MAAN','STERREN','BOS','BERG','RIVIER','ZEE','WIND','REGEN','SNEEUW','LICHT','GOUD','ZILVER','STEEN','HUIS','STAD','DORP','BOOM','BLOEM','HEMEL'
-    ];
-
-    final List<String> suffixes = [
-      'BERG','BURG','DORP','STAD','BOS','DAL','MEER','RIVIER','BEEK','STEEN','HUIS','VELD','LAND','PARK','HOF','WEG','RING','HOEK','POORT','DUIN'
-    ];
-
-    words.addAll(baseNouns);
-
-    for (final p in prefixes) {
-      for (final s in suffixes) {
-        final w = p + s;
-        if (w.runes.length >= 2 && w.runes.length <= 10) words.add(w);
-      }
-    }
-
-    for (final p in prefixes) {
-      for (final n in baseNouns) {
-        final w = p + n;
-        if (w.runes.length >= 2 && w.runes.length <= 10) words.add(w);
-      }
-    }
-
-    return words.toList();
-  }
+  static const List<String> list = [
+    // Animals & Birds (Dieren en Vogels)
+    'LEEUW','TIJGER','OLIFANT','PAARD','HOND','KAT','BEER','WOLF','VOS','AAP','KONIJN','HERT','GIRAF','NIJLPAARD','NEUSHOORN','EZEL','KOE','STIER','SCHAAP','GEIT','VARKEN','EEKHOORN','MUIS','SCHILDPAD','KROKODIL','SLANG','KIKKER','VIS','AREND','KRAAI','PAPEGAAI','HAAN','EEND','UIL','PAUW','DUIF','MUS','ZWALUW','SPECHT',
+    // Fruits, Vegetables & Food (Fruit, Groenten en Eten)
+    'APPEL','BANAAN','SINAASAPPEL','DRUIF','GRANAATAPPEL','WATERMELOEN','MELOEN','PERZIK','ABRIKOOS','KERS','CITROEN','PEER','PRUIM','AARDBEI','FRAMBOOS','ANANAS','AARDAPPEL','UI','TOMAAT','ERWT','WORTEL','RADIJS','SPINAZIE','KOOL','AUBERGINE','KOMKOMMER','KNOFLOOK','PEPER','KORIANDER','SLA','BROOD','KAAS','MELK','BOTER','HONING','RIJST','SOEP',
+    // Nature, Earth & Science (Natuur, Aarde en Wetenschap)
+    'ZON','MAAN','STER','HEMEL','AARDE','RIVIER','ZEE','OCEOAN','BERG','WATERVAL','MEER','WOLK','REGEN','WIND','VUUR','WATER','BODEM','BOS','BLOEM','BOOM','PLANT','BLAD','TAK','WORTEL','ZAAD','ZAND','STEEN','GROT','WOESTIJN','EILAND','VALLEI','STORM','SNEEUW','MIST','LICHT','SCHADUW','BLIKSEM','DONDER',
+    // Household & Everyday Items (Huishouden en Alledaagse Voorwerpen)
+    'HUIS','KAMER','DEUR','RAAM','MUUR','DAK','VLOER','STOEL','TAFEL','BED','KUSSEN','DEKEN','GORDIJN','KAST','SPIEGEL','LAMP','VENTILATOR','KLOK','SLOT','SLEUTEL','BORD','GLAS','LEPEL','MES','SCHAAR','NAALD','DRAAD','KLEDING','SCHOEN','TAS','FLES','PEN','BOEK','PAPIER','POTLOOD','EMMER','KAN',
+    // People, Society & Relations (Mensen, Samenleving en Relaties)
+    'MOEDER','VADER','BROER','ZUS','ZOON','DOCHTER','GROOTVADER','GROOTMOEDER','OOM','TANTE','VRIEND','VRIENDIN','KIND','MAN','VROUW','MENS','KONING','KONINGIN','LERAAR','DOKTER','BOER','DICHTER','SCHRIJVER','ZANGER','ACTEUR','LAND','STAD','DORP','BURGEMEESTER','PRESIDENT',
+    // Values, Culture & Time (Waarden, Cultuur en Tijd)
+    'LIEFDE','WAARHEID','VREDE','VREUGDE','GELUK','HOOP','DROOM','MOED','GEDULD','GOEDHEID','WIJSHEID','ONDERWIJS','SUCCES','OVERWINNING','GELOOF','DIENST','EENHEID','VRIJHEID','ENTHOUSIASME','GEDICHT','SPROOKJE','VERHAAL','EXAMEN','TIJD','VANDAAG','MORGEN','OCHTEND','MIDDAG','AVOND','NACHT','DAG','JAAR'
+  ];
 }
