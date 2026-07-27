@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'logic/ad_helper.dart';
 import 'providers/game_provider.dart';
+import 'providers/jumbled_game_provider.dart';
 import 'providers/progress_provider.dart';
 import 'screens/home_screen.dart';
 import 'utils/app_theme.dart';
@@ -26,6 +27,7 @@ void main() async {
       providers: [
         ChangeNotifierProvider.value(value: progressProvider),
         ChangeNotifierProvider(create: (_) => GameProvider()),
+        ChangeNotifierProvider(create: (_) => JumbledGameProvider()),
       ],
       child: const WordSearchApp(),
     ),

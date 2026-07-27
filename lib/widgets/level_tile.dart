@@ -6,15 +6,25 @@ import '../utils/constants.dart';
 
 class LevelTile extends StatelessWidget {
   final int level;
+  final bool isJumbled;
   final VoidCallback? onTap;
 
-  const LevelTile({super.key, required this.level, this.onTap});
+  const LevelTile({
+    super.key,
+    required this.level,
+    this.isJumbled = false,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     final progress = context.watch<ProgressProvider>();
-    final isUnlocked = progress.isLevelUnlocked(level);
-    final bestTime = progress.bestTimeForLevel(level);
+    final isUnlocked = isJumbled
+        ? progress.isJumbledLevelUnlocked(level)
+        : progress.isLevelUnlocked(level);
+    final bestTime = isJumbled
+        ? progress.jumbledBestTimeForLevel(level)
+        : progress.bestTimeForLevel(level);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final Color primary = AppConstants.wordColors[(level - 1) % AppConstants.wordColors.length];
