@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'logic/ad_helper.dart';
 import 'providers/game_provider.dart';
 import 'providers/progress_provider.dart';
 import 'screens/home_screen.dart';
@@ -9,6 +10,7 @@ import 'utils/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await AdHelper.init();
 
   // Lock to portrait
   await SystemChrome.setPreferredOrientations([

@@ -1,6 +1,6 @@
-// Screens: LevelCompleteScreen — shows stars rewarded, total stars, time, next level
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../logic/ad_helper.dart';
 import '../logic/level_manager.dart';
 import '../providers/game_provider.dart';
 import '../providers/progress_provider.dart';
@@ -158,17 +158,24 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
                     ],
                   ),
                   const Spacer(),
-                  // Next level button
                   _GradientButton(
                     label: 'Next Level',
                     icon: Icons.arrow_forward_rounded,
                     onTap: () {
-                      context.read<GameProvider>().reset();
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => GameScreen(level: nextLevel)),
-                      );
+                      void navigate() {
+                        context.read<GameProvider>().reset();
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => GameScreen(level: nextLevel)),
+                        );
+                      }
+
+                      if (widget.level % 5 == 0) {
+                        AdHelper.showInterstitialAd(navigate);
+                      } else {
+                        navigate();
+                      }
                     },
                   ),
                   const SizedBox(height: 14),

@@ -1,6 +1,7 @@
 // Screens: GameOverScreen — time's up with retry option and star deduction info
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../logic/ad_helper.dart';
 import '../providers/game_provider.dart';
 import '../providers/progress_provider.dart';
 import 'game_screen.dart';
@@ -193,12 +194,17 @@ class _GameOverScreenState extends State<GameOverScreen>
                 // Retry
                 GestureDetector(
                   onTap: () {
-                    context.read<GameProvider>().reset();
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => GameScreen(level: widget.level),
-                      ),
+                    AdHelper.showRewardedAd(
+                      onRewardGranted: () {
+                        context.read<GameProvider>().reset();
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => GameScreen(level: widget.level),
+                          ),
+                        );
+                      },
+                      onAdClosed: () {},
                     );
                   },
                   child: Container(
