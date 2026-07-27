@@ -25,6 +25,7 @@ class AppConstants {
   static const String prefHighestLevel = 'highest_level';
   static const String prefBestTimes = 'best_times';
   static const String prefTotalStars = 'total_stars';
+  static const String prefLanguage = 'selected_language';
   static const String prefSoundEnabled = 'sound_enabled';
   static const String prefDarkMode = 'dark_mode';
 

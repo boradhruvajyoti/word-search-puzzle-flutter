@@ -1,6 +1,7 @@
-// Screens: SettingsScreen — sound, theme, reset progress
+// Screens: SettingsScreen — sound, theme, multi-language selector, reset progress
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../models/app_language.dart';
 import '../providers/progress_provider.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -10,6 +11,7 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final progress = context.watch<ProgressProvider>();
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final currentLang = AppLanguage.fromCode(progress.languageCode);
 
     return Scaffold(
       appBar: AppBar(
@@ -23,6 +25,30 @@ class SettingsScreen extends StatelessWidget {
         padding: const EdgeInsets.all(20),
         children: [
           _SectionHeader(title: 'Preferences', isDark: isDark),
+          const SizedBox(height: 8),
+          _SettingsTile(
+            icon: Icons.language_rounded,
+            label: 'Game Language',
+            isDark: isDark,
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  '${currentLang.flag} ${currentLang.name}',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: isDark
+                        ? const Color(0xFF8B84FF)
+                        : const Color(0xFF6C63FF),
+                  ),
+                ),
+                const SizedBox(width: 4),
+                const Icon(Icons.chevron_right_rounded),
+              ],
+            ),
+            onTap: () => _showLanguagePicker(context, progress),
+          ),
           const SizedBox(height: 8),
           _SettingsTile(
             icon: Icons.dark_mode_rounded,
@@ -57,6 +83,82 @@ class SettingsScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  void _showLanguagePicker(BuildContext context, ProgressProvider progress) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) {
+        final isDark = Theme.of(ctx).brightness == Brightness.dark;
+        return Container(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: isDark ? Colors.white30 : Colors.black26,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Select Game Language',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                  color: isDark
+                      ? const Color(0xFFE8E9FF)
+                      : const Color(0xFF1A1B2E),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Flexible(
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: AppLanguage.languages.length,
+                  itemBuilder: (context, index) {
+                    final lang = AppLanguage.languages[index];
+                    final isSelected = lang.code == progress.languageCode;
+                    return ListTile(
+                      leading: Text(lang.flag,
+                          style: const TextStyle(fontSize: 24)),
+                      title: Text(
+                        lang.name,
+                        style: TextStyle(
+                          fontWeight:
+                              isSelected ? FontWeight.w800 : FontWeight.w500,
+                          color: isSelected
+                              ? const Color(0xFF6C63FF)
+                              : (isDark
+                                  ? const Color(0xFFE8E9FF)
+                                  : const Color(0xFF1A1B2E)),
+                        ),
+                      ),
+                      subtitle: Text(lang.nativeName,
+                          style: const TextStyle(fontSize: 12)),
+                      trailing: isSelected
+                          ? const Icon(Icons.check_circle_rounded,
+                              color: Color(0xFF6C63FF))
+                          : null,
+                      onTap: () {
+                        progress.setLanguage(lang.code);
+                        Navigator.pop(ctx);
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 

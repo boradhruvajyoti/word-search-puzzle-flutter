@@ -27,7 +27,8 @@ class _GameScreenState extends State<GameScreen> {
     if (!_initialized) {
       _initialized = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.read<GameProvider>().startLevel(widget.level);
+        final lang = context.read<ProgressProvider>().languageCode;
+        context.read<GameProvider>().startLevel(widget.level, lang);
       });
     }
   }

@@ -37,7 +37,7 @@ class GameProvider extends ChangeNotifier {
   bool get allFound => _words.isNotEmpty && _words.every((w) => w.isFound);
 
   // ── Game lifecycle ─────────────────────────────────────────────────────────
-  void startLevel(int level) {
+  void startLevel(int level, [String languageCode = 'en']) {
     _timer?.cancel();
     _status = GameStatus.playing;
     _config = LevelManager.configForLevel(level);
@@ -45,7 +45,7 @@ class GameProvider extends ChangeNotifier {
     _swipeStart = null;
 
     final availableWords =
-        WordBank.randomWordsForSize(_config!.gridSize);
+        WordBank.randomWordsForLanguage(_config!.gridSize, languageCode);
     final selectedWords = availableWords.take(_config!.wordCount).toList();
 
     final result = GridGenerator(

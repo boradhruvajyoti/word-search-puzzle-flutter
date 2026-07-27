@@ -1,6 +1,7 @@
 // Screens: HomeScreen — main landing screen
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../models/app_language.dart';
 import '../providers/progress_provider.dart';
 import '../utils/app_theme.dart';
 import 'game_screen.dart';
@@ -98,17 +99,68 @@ class _HomeScreenState extends State<HomeScreen>
                           ],
                         ),
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.settings_rounded),
-                        iconSize: 28,
-                        color: isDark
-                            ? const Color(0xFF8B84FF)
-                            : const Color(0xFF6C63FF),
-                        onPressed: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) => const SettingsScreen()),
-                        ),
+                      Row(
+                        children: [
+                          GestureDetector(
+                            onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => const SettingsScreen()),
+                            ),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: isDark
+                                    ? const Color(0xFF1A1B2E)
+                                    : Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.06),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 3),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    AppLanguage.fromCode(progress.languageCode)
+                                        .flag,
+                                    style: const TextStyle(fontSize: 18),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    AppLanguage.fromCode(progress.languageCode)
+                                        .code
+                                        .toUpperCase(),
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w800,
+                                      fontSize: 12,
+                                      color: isDark
+                                          ? const Color(0xFF8B84FF)
+                                          : const Color(0xFF6C63FF),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          IconButton(
+                            icon: const Icon(Icons.settings_rounded),
+                            iconSize: 28,
+                            color: isDark
+                                ? const Color(0xFF8B84FF)
+                                : const Color(0xFF6C63FF),
+                            onPressed: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) => const SettingsScreen()),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),

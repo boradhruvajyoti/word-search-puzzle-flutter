@@ -8,12 +8,14 @@ class ProgressProvider extends ChangeNotifier {
   int _highestUnlockedLevel = 1;
   Map<int, int> _bestTimes = {}; // level → best time remaining
   int _totalStars = 0;
+  String _languageCode = 'en';
   bool _soundEnabled = true;
   bool _darkMode = false;
 
   int get highestUnlockedLevel => _highestUnlockedLevel;
   Map<int, int> get bestTimes => Map.unmodifiable(_bestTimes);
   int get totalStars => _totalStars;
+  String get languageCode => _languageCode;
   bool get soundEnabled => _soundEnabled;
   bool get darkMode => _darkMode;
 
@@ -26,6 +28,7 @@ class ProgressProvider extends ChangeNotifier {
     _highestUnlockedLevel =
         prefs.getInt(AppConstants.prefHighestLevel) ?? 1;
     _totalStars = prefs.getInt(AppConstants.prefTotalStars) ?? 0;
+    _languageCode = prefs.getString(AppConstants.prefLanguage) ?? 'en';
     _soundEnabled = prefs.getBool(AppConstants.prefSoundEnabled) ?? true;
     _darkMode = prefs.getBool(AppConstants.prefDarkMode) ?? false;
 
@@ -66,6 +69,13 @@ class ProgressProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> setLanguage(String code) async {
+    _languageCode = code;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(AppConstants.prefLanguage, code);
+    notifyListeners();
+  }
+
   Future<void> setSoundEnabled(bool value) async {
     _soundEnabled = value;
     final prefs = await SharedPreferences.getInstance();
@@ -95,6 +105,7 @@ class ProgressProvider extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt(AppConstants.prefHighestLevel, _highestUnlockedLevel);
     await prefs.setInt(AppConstants.prefTotalStars, _totalStars);
+    await prefs.setString(AppConstants.prefLanguage, _languageCode);
     final encoded = jsonEncode(
       _bestTimes.map((k, v) => MapEntry(k.toString(), v)),
     );
