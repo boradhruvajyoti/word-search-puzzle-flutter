@@ -24,6 +24,18 @@ void main() {
   });
 
   group('WordBank multi-language word fetching', () {
+    test('print exact word count per language', () {
+      for (final lang in AppLanguage.languages) {
+        if (lang.code == 'en') {
+          final words = WordBank.randomWordsForLanguage(10, 'en');
+          print('COUNT | ${lang.name} (en): ${words.length} filtered (10,000+ total in categories)');
+        } else {
+          final list = WordBank.multiLangBank[lang.code] ?? [];
+          print('COUNT | ${lang.name} (${lang.code}): ${list.length} words');
+        }
+      }
+    });
+
     for (final lang in AppLanguage.languages) {
       test('fetches valid words for language: ${lang.name} (${lang.code})', () {
         final words = WordBank.randomWordsForLanguage(8, lang.code);
