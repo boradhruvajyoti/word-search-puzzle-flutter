@@ -8,53 +8,49 @@ class LevelManager {
 
   /// Generates a [LevelConfig] for the given [level] (1-indexed, supports 1–1000+).
   ///
-  /// Difficulty phases:
-  ///  Phase 1 (Levels 1–20):   Grid 5x5 (1–10) to 6x6 (11–20)
-  ///  Phase 2 (Levels 21–40):  Grid 7x7 (21–30) to 8x8 (31–40)
-  ///  Phase 3 (Levels 41–100): Grid 9x9
-  ///  Phase 4 (Levels 101–1000): Grid 10x10
+  /// Level tiers:
+  ///  Levels 1–20:   5x5 grid,  5 words,  60s time
+  ///  Levels 21–40:  6x6 grid,  7 words,  75s time
+  ///  Levels 41–100: 7x7 grid,  9 words,  90s time
+  ///  Levels 101–200: 8x8 grid, 11 words, 120s time
+  ///  Levels 201–500: 9x9 grid, 13 words, 150s time
+  ///  Levels 501–750: 10x10 grid, 15 words, 180s time
+  ///  Levels 751–1000: 10x10 grid, 20 words, 210s time
   static LevelConfig configForLevel(int level) {
     assert(level >= 1, 'Level must be >= 1');
 
     final int gridSize;
-    if (level <= 10) {
+    final int wordCount;
+    final int timeLimit;
+
+    if (level <= 20) {
       gridSize = 5;
-    } else if (level <= 20) {
-      gridSize = 6;
-    } else if (level <= 30) {
-      gridSize = 7;
+      wordCount = 5;
+      timeLimit = 60;
     } else if (level <= 40) {
-      gridSize = 8;
+      gridSize = 6;
+      wordCount = 7;
+      timeLimit = 75;
     } else if (level <= 100) {
+      gridSize = 7;
+      wordCount = 9;
+      timeLimit = 90;
+    } else if (level <= 200) {
+      gridSize = 8;
+      wordCount = 11;
+      timeLimit = 120;
+    } else if (level <= 500) {
       gridSize = 9;
+      wordCount = 13;
+      timeLimit = 150;
+    } else if (level <= 750) {
+      gridSize = 10;
+      wordCount = 15;
+      timeLimit = 180;
     } else {
       gridSize = 10;
-    }
-
-    final int wordCount;
-    if (level <= 10) {
-      wordCount = level <= 5 ? 4 : 5;
-    } else if (level <= 20) {
-      wordCount = level <= 15 ? 5 : 6;
-    } else if (level <= 30) {
-      wordCount = level <= 25 ? 6 : 7;
-    } else if (level <= 40) {
-      wordCount = level <= 35 ? 7 : 8;
-    } else if (level <= 100) {
-      wordCount = 9 + ((level - 41) * 3 ~/ 59); // 9..12
-    } else {
-      wordCount = 13 + ((level - 101) * 7 ~/ 899); // 13..20
-    }
-
-    final int timeLimit;
-    if (level <= 20) {
-      timeLimit = 50 + level * 2;
-    } else if (level <= 40) {
-      timeLimit = 90 + (level - 20) * 2;
-    } else if (level <= 100) {
-      timeLimit = 130 + ((level - 40) * 50 ~/ 60);
-    } else {
-      timeLimit = (180 - ((level - 100) ~/ 7)).clamp(60, 180);
+      wordCount = 20;
+      timeLimit = 210;
     }
 
     final category = WordBank.categoryForLevel(level);
