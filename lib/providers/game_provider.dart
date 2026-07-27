@@ -51,6 +51,7 @@ class GameProvider extends ChangeNotifier {
     final result = GridGenerator(
       gridSize: _config!.gridSize,
       words: selectedWords,
+      languageCode: languageCode,
     ).generate();
 
     _grid = result.grid;
