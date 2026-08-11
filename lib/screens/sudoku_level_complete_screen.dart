@@ -1,34 +1,34 @@
-// Screens: JumbledLevelCompleteScreen — level complete victory view for Jumbled Words
+// Screens: SudokuLevelCompleteScreen — win screen for Sudoku mode
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../logic/ad_helper.dart';
-import '../logic/jumbled_level_manager.dart';
-import '../providers/jumbled_game_provider.dart';
+import '../logic/sudoku_level_manager.dart';
 import '../providers/progress_provider.dart';
-import '../utils/extensions.dart';
+import '../providers/sudoku_game_provider.dart';
 import '../widgets/star_rating.dart';
-import 'jumbled_game_screen.dart';
+import '../utils/extensions.dart';
+import 'sudoku_game_screen.dart';
 
-class JumbledLevelCompleteScreen extends StatefulWidget {
+class SudokuLevelCompleteScreen extends StatefulWidget {
   final int level;
   final int timeRemaining;
 
-  const JumbledLevelCompleteScreen({
+  const SudokuLevelCompleteScreen({
     super.key,
     required this.level,
     required this.timeRemaining,
   });
 
   @override
-  State<JumbledLevelCompleteScreen> createState() =>
-      _JumbledLevelCompleteScreenState();
+  State<SudokuLevelCompleteScreen> createState() =>
+      _SudokuLevelCompleteScreenState();
 }
 
-class _JumbledLevelCompleteScreenState extends State<JumbledLevelCompleteScreen>
+class _SudokuLevelCompleteScreenState extends State<SudokuLevelCompleteScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  late Animation<double> _fadeSlideFade;
-  late Animation<Offset> _slideAnim;
+  late Animation<double> _fade;
+  late Animation<Offset> _slide;
 
   @override
   void initState() {
@@ -37,10 +37,10 @@ class _JumbledLevelCompleteScreenState extends State<JumbledLevelCompleteScreen>
       vsync: this,
       duration: const Duration(milliseconds: 600),
     );
-    _fadeSlideFade = Tween<double>(begin: 0.0, end: 1.0).animate(
+    _fade = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeOut),
     );
-    _slideAnim =
+    _slide =
         Tween<Offset>(begin: const Offset(0, 0.2), end: Offset.zero).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeOut),
     );
@@ -55,11 +55,10 @@ class _JumbledLevelCompleteScreenState extends State<JumbledLevelCompleteScreen>
 
   @override
   Widget build(BuildContext context) {
+    final config = SudokuLevelManager.configForLevel(widget.level);
+    final stars = SudokuLevelManager.starsEarned(
+        widget.timeRemaining, config.timeLimit);
     final progress = context.watch<ProgressProvider>();
-    final config = JumbledLevelManager.configForLevel(
-        widget.level, progress.languageCode);
-    final stars =
-        JumbledLevelManager.starsEarned(widget.timeRemaining, config.timeLimit);
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final nextLevel = widget.level + 1;
     final starsRewarded = widget.timeRemaining;
@@ -67,40 +66,40 @@ class _JumbledLevelCompleteScreenState extends State<JumbledLevelCompleteScreen>
     return Scaffold(
       body: SafeArea(
         child: FadeTransition(
-          opacity: _fadeSlideFade,
+          opacity: _fade,
           child: SlideTransition(
-            position: _slideAnim,
+            position: _slide,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 32),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Spacer(),
-                  // Trophy Icon Container
+                  // Trophy icon
                   Container(
                     width: 100,
                     height: 100,
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
-                        colors: [Color(0xFF00C9A7), Color(0xFF06D6A0)],
+                        colors: [Color(0xFF3A86FF), Color(0xFF6C63FF)],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
                       borderRadius: BorderRadius.circular(28),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFF00C9A7).withValues(alpha: 0.4),
+                          color: const Color(0xFF3A86FF).withValues(alpha: 0.4),
                           blurRadius: 24,
                           offset: const Offset(0, 8),
                         ),
                       ],
                     ),
-                    child: const Icon(Icons.stars_rounded,
-                        color: Colors.white, size: 64),
+                    child: const Icon(Icons.grid_4x4_rounded,
+                        color: Colors.white, size: 56),
                   ),
                   const SizedBox(height: 24),
                   Text(
-                    'Jumbled Level ${widget.level} Solved!',
+                    'Sudoku Level ${widget.level} Solved!',
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.w800,
@@ -110,18 +109,30 @@ class _JumbledLevelCompleteScreenState extends State<JumbledLevelCompleteScreen>
                     ),
                     textAlign: TextAlign.center,
                   ),
+                  const SizedBox(height: 8),
+                  Text(
+                    SudokuLevelManager.difficultyName(widget.level),
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: isDark
+                          ? const Color(0xFF8B84FF)
+                          : const Color(0xFF6C63FF),
+                    ),
+                  ),
                   const SizedBox(height: 24),
                   StarRating(stars: stars),
                   const SizedBox(height: 20),
-                  // Rewarded Stars Badge
+                  // Stars rewarded badge
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 10),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFFBE0B).withValues(alpha: 0.15),
+                      color:
+                          const Color(0xFFFFBE0B).withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(20),
-                      border:
-                          Border.all(color: const Color(0xFFFFBE0B), width: 1.5),
+                      border: Border.all(
+                          color: const Color(0xFFFFBE0B), width: 1.5),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -141,7 +152,7 @@ class _JumbledLevelCompleteScreenState extends State<JumbledLevelCompleteScreen>
                     ),
                   ),
                   const SizedBox(height: 16),
-                  // Info Chips
+                  // Info chips
                   Wrap(
                     alignment: WrapAlignment.center,
                     spacing: 12,
@@ -155,70 +166,42 @@ class _JumbledLevelCompleteScreenState extends State<JumbledLevelCompleteScreen>
                       ),
                       _InfoChip(
                         label: 'Total Stars',
-                        value: '${progress.jumbledTotalStars}',
+                        value: '${progress.totalStars}',
                         icon: Icons.stars_rounded,
                         isDark: isDark,
                       ),
                     ],
                   ),
                   const Spacer(),
-                  // Action Button with AdMob Interstitial Ad logic
-                  GestureDetector(
+                  // Next Level button
+                  _GradientButton(
+                    label: 'Next Level',
+                    icon: Icons.arrow_forward_rounded,
                     onTap: () {
                       void navigate() {
-                        context.read<JumbledGameProvider>().reset();
+                        context.read<SudokuGameProvider>().reset();
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => JumbledGameScreen(level: nextLevel),
+                            builder: (_) =>
+                                SudokuGameScreen(level: nextLevel),
                           ),
                         );
                       }
 
+                      // Show interstitial every 5 levels (same logic as Word Search)
                       if (widget.level % 5 == 0) {
                         AdHelper.showInterstitialAd(navigate);
                       } else {
                         navigate();
                       }
                     },
-                    child: Container(
-                      height: 60,
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF00C9A7), Color(0xFF3A86FF)],
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                        ),
-                        borderRadius: BorderRadius.circular(18),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(0xFF00C9A7).withValues(alpha: 0.4),
-                            blurRadius: 18,
-                            offset: const Offset(0, 6),
-                          ),
-                        ],
-                      ),
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text('Next Level',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w800)),
-                          SizedBox(width: 10),
-                          Icon(Icons.arrow_forward_rounded,
-                              color: Colors.white, size: 26),
-                        ],
-                      ),
-                    ),
                   ),
                   const SizedBox(height: 14),
                   TextButton(
                     onPressed: () {
-                      context.read<JumbledGameProvider>().reset();
-                      Navigator.of(context)
-                          .popUntil((route) => route.isFirst);
+                      context.read<SudokuGameProvider>().reset();
+                      Navigator.of(context).popUntil((route) => route.isFirst);
                     },
                     child: Text(
                       'Back to Home',
@@ -266,15 +249,16 @@ class _InfoChip extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: const Color(0xFF00C9A7), size: 22),
+          Icon(icon, color: const Color(0xFF3A86FF), size: 22),
           const SizedBox(width: 10),
           Text(
             '$label: ',
             style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w500,
-              color:
-                  isDark ? const Color(0xFF8B84FF) : const Color(0xFF6C63FF),
+              color: isDark
+                  ? const Color(0xFF8B84FF)
+                  : const Color(0xFF6C63FF),
             ),
           ),
           Text(
@@ -288,6 +272,52 @@ class _InfoChip extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _GradientButton extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final VoidCallback onTap;
+
+  const _GradientButton(
+      {required this.label, required this.icon, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 60,
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFF3A86FF), Color(0xFF6C63FF)],
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+          ),
+          borderRadius: BorderRadius.circular(18),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF3A86FF).withValues(alpha: 0.4),
+              blurRadius: 18,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(label,
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w800)),
+            const SizedBox(width: 10),
+            Icon(icon, color: Colors.white, size: 26),
+          ],
+        ),
       ),
     );
   }

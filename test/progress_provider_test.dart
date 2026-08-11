@@ -1,4 +1,3 @@
-// Unit tests: ProgressProvider Star Rewarding System
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:word_search_puzzle/providers/progress_provider.dart';
@@ -10,60 +9,69 @@ void main() {
     SharedPreferences.setMockInitialValues({});
   });
 
-  group('ProgressProvider Star Rewarding System', () {
-    test('initial totalStars is 0', () async {
-      final progress = ProgressProvider();
-      await progress.load();
-      expect(progress.totalStars, 0);
+  group('ProgressProvider Star Unlock', () {
+    test('starCostToUnlock calculates cost as 5x level', () {
+      expect(ProgressProvider.starCostToUnlock(1), 5);
+      expect(ProgressProvider.starCostToUnlock(10), 50);
+      expect(ProgressProvider.starCostToUnlock(50), 250);
+      expect(ProgressProvider.starCostToUnlock(100), 500);
     });
 
-    test('rewards as many stars as seconds left on level completion', () async {
-      final progress = ProgressProvider();
-      await progress.load();
+    test('unlockLevelWithStars deducts stars and unlocks Word Search level', () async {
+      final provider = ProgressProvider();
+      // Initially level 50 is locked
+      expect(provider.isLevelUnlocked(50), isFalse);
 
-      // Complete level 1 with 45 seconds remaining
-      await progress.completeLevel(1, 45);
-      expect(progress.totalStars, 45);
+      // Earn 300 stars by completing level 1 with 300s remaining
+      await provider.completeLevel(1, 300);
+      expect(provider.totalStars, 300);
 
-      // Complete level 2 with 30 seconds remaining
-      await progress.completeLevel(2, 30);
-      expect(progress.totalStars, 75); // 45 + 30
+      // Cost for level 50 is 50 * 5 = 250
+      expect(provider.canAffordUnlock(50), isTrue);
+
+      final success = await provider.unlockLevelWithStars(50);
+      expect(success, isTrue);
+      expect(provider.totalStars, 50); // 300 - 250
+      expect(provider.isLevelUnlocked(50), isTrue);
     });
 
-    test('deducts total time limit on level failure', () async {
-      final progress = ProgressProvider();
-      await progress.load();
+    test('unlockSudokuLevelWithStars deducts stars and unlocks Sudoku level', () async {
+      final provider = ProgressProvider();
+      expect(provider.isSudokuLevelUnlocked(20), isFalse);
 
-      // Earn 100 stars first
-      await progress.completeLevel(1, 100);
-      expect(progress.totalStars, 100);
+      await provider.completeSudokuLevel(1, 150);
+      expect(provider.totalStars, 150);
 
-      // Fail a level with time limit of 60 seconds
-      await progress.failLevel(2, 60);
-      expect(progress.totalStars, 40); // 100 - 60
+      // Cost for level 20 is 20 * 5 = 100
+      expect(provider.canAffordUnlock(20), isTrue);
+
+      final success = await provider.unlockSudokuLevelWithStars(20);
+      expect(success, isTrue);
+      expect(provider.totalStars, 50); // 150 - 100
+      expect(provider.isSudokuLevelUnlocked(20), isTrue);
     });
 
-    test('totalStars does not go below 0 when deducted on failure', () async {
-      final progress = ProgressProvider();
-      await progress.load();
+    test('star unlocking level 50 does not unlock intermediate unplayed levels (2..49)', () async {
+      final provider = ProgressProvider();
+      await provider.completeLevel(1, 300);
+      await provider.unlockLevelWithStars(50);
 
-      // Earn 30 stars
-      await progress.completeLevel(1, 30);
-      expect(progress.totalStars, 30);
+      expect(provider.isLevelUnlocked(1), isTrue);
+      expect(provider.isLevelUnlocked(2), isTrue); // unlocked by completing level 1
+      expect(provider.isLevelUnlocked(3), isFalse); // level 2 not completed
+      expect(provider.isLevelUnlocked(25), isFalse);
+      expect(provider.isLevelUnlocked(49), isFalse);
+      expect(provider.isLevelUnlocked(50), isTrue); // star unlocked
+      expect(provider.isLevelUnlocked(51), isFalse); // level 50 not completed yet
 
-      // Fail a level with time limit of 75 seconds -> 30 - 75 = -45 => clamped to 0
-      await progress.failLevel(2, 75);
-      expect(progress.totalStars, 0);
-    });
+      // Completing level 50 unlocks level 51, but levels 3..49 MUST remain locked
+      await provider.completeLevel(50, 100);
 
-    test('resetProgress resets totalStars to 0', () async {
-      final progress = ProgressProvider();
-      await progress.load();
-      await progress.completeLevel(1, 50);
-      expect(progress.totalStars, 50);
-
-      await progress.resetProgress();
-      expect(progress.totalStars, 0);
+      expect(provider.isLevelUnlocked(50), isTrue);
+      expect(provider.isLevelUnlocked(51), isTrue);
+      expect(provider.isLevelUnlocked(3), isFalse);
+      expect(provider.isLevelUnlocked(25), isFalse);
+      expect(provider.isLevelUnlocked(49), isFalse);
     });
   });
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/progress_provider.dart';
 import '../widgets/level_tile.dart';
+import '../widgets/unlock_level_dialog.dart';
 import 'game_screen.dart';
 
 class LevelSelectScreen extends StatelessWidget {
@@ -41,7 +42,7 @@ class LevelSelectScreen extends StatelessWidget {
                       color: Color(0xFFFFBE0B), size: 22),
                   const SizedBox(width: 8),
                   Text(
-                    '${progress.highestUnlockedLevel - 1} levels completed',
+                    '${progress.completedLevelsCount} levels completed',
                     style: TextStyle(
                       fontWeight: FontWeight.w700,
                       fontSize: 14,
@@ -95,12 +96,46 @@ class LevelSelectScreen extends StatelessWidget {
                       builder: (_) => GameScreen(level: level),
                     ),
                   ),
+                  onLockedTap: () =>
+                      _showUnlockDialog(context, level, isSudoku: false),
                 );
               },
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Future<void> _showUnlockDialog(
+    BuildContext context,
+    int level, {
+    required bool isSudoku,
+  }) async {
+    final progress = context.read<ProgressProvider>();
+    final cost = ProgressProvider.starCostToUnlock(level);
+    final canAfford = progress.canAffordUnlock(level);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => UnlockLevelDialog(
+        level: level,
+        cost: cost,
+        currentStars: progress.totalStars,
+        canAfford: canAfford,
+        isDark: isDark,
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    final success = await progress.unlockLevelWithStars(level);
+    if (!success || !context.mounted) return;
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => GameScreen(level: level)),
     );
   }
 }

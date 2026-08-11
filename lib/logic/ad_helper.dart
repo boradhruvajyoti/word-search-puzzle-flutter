@@ -12,34 +12,51 @@ class AdHelper {
 
   // Official Google AdMob Test Ad Unit IDs
   static String get interstitialAdUnitId {
-    if (Platform.isAndroid) {
-      return 'ca-app-pub-3940256099942544/1033173712';
-    } else if (Platform.isIOS) {
-      return 'ca-app-pub-3940256099942544/4411468910';
-    } else {
-      throw UnsupportedError('Unsupported platform');
-    }
+    if (kIsWeb) return '';
+    try {
+      if (Platform.isAndroid) {
+        return 'ca-app-pub-3940256099942544/1033173712';
+      } else if (Platform.isIOS) {
+        return 'ca-app-pub-3940256099942544/4411468910';
+      }
+    } catch (_) {}
+    return '';
   }
 
   static String get rewardedAdUnitId {
-    if (Platform.isAndroid) {
-      return 'ca-app-pub-3940256099942544/5224354917';
-    } else if (Platform.isIOS) {
-      return 'ca-app-pub-3940256099942544/1712485313';
-    } else {
-      throw UnsupportedError('Unsupported platform');
-    }
+    if (kIsWeb) return '';
+    try {
+      if (Platform.isAndroid) {
+        return 'ca-app-pub-3940256099942544/5224354917';
+      } else if (Platform.isIOS) {
+        return 'ca-app-pub-3940256099942544/1712485313';
+      }
+    } catch (_) {}
+    return '';
   }
 
-  /// Initializes the Mobile Ads SDK and preloads ads.
+  /// Initializes the Mobile Ads SDK and preloads ads safely.
   static Future<void> init() async {
-    await MobileAds.instance.initialize();
-    loadInterstitialAd();
-    loadRewardedAd();
+    if (kIsWeb) return;
+    try {
+      if (Platform.isAndroid || Platform.isIOS) {
+        await MobileAds.instance.initialize();
+        loadInterstitialAd();
+        loadRewardedAd();
+      }
+    } catch (e) {
+      debugPrint('AdHelper: failed to initialize ads: $e');
+    }
   }
 
   /// Preloads an Interstitial Ad (skippable video).
   static void loadInterstitialAd() {
+    if (kIsWeb) return;
+    try {
+      if (!Platform.isAndroid && !Platform.isIOS) return;
+    } catch (_) {
+      return;
+    }
     if (_isInterstitialLoading || _interstitialAd != null) return;
     _isInterstitialLoading = true;
 
@@ -63,6 +80,12 @@ class AdHelper {
 
   /// Preloads a Rewarded Ad.
   static void loadRewardedAd() {
+    if (kIsWeb) return;
+    try {
+      if (!Platform.isAndroid && !Platform.isIOS) return;
+    } catch (_) {
+      return;
+    }
     if (_isRewardedLoading || _rewardedAd != null) return;
     _isRewardedLoading = true;
 

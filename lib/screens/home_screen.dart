@@ -4,12 +4,12 @@ import 'package:provider/provider.dart';
 import '../providers/progress_provider.dart';
 import '../utils/app_theme.dart';
 import 'game_screen.dart';
-import 'jumbled_game_screen.dart';
-import 'jumbled_level_select_screen.dart';
 import 'level_select_screen.dart';
 import 'settings_screen.dart';
+import 'sudoku_game_screen.dart';
+import 'sudoku_level_select_screen.dart';
 
-enum GameSection { wordSearch, jumbledWords }
+enum GameSection { wordSearch, sudoku }
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -57,32 +57,32 @@ class _HomeScreenState extends State<HomeScreen>
     final progress = context.watch<ProgressProvider>();
 
     final isWordSearch = _selectedSection == GameSection.wordSearch;
-    final currentStars = isWordSearch
-        ? progress.totalStars
-        : progress.jumbledTotalStars;
+
+    final currentStars = progress.totalStars;
     final currentLevel = isWordSearch
         ? progress.highestUnlockedLevel
-        : progress.jumbledHighestUnlockedLevel;
+        : progress.sudokuHighestUnlockedLevel;
 
     return Scaffold(
       body: SafeArea(
         child: Stack(
           children: [
             // Decorative background blobs
-            _buildBg(isDark),
+            _buildBg(isDark, isWordSearch),
             // Main content
             Column(
               children: [
                 // Top Header Row
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       // Total Stars Badge
                       Container(
-                        padding:
-                            const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 8),
                         decoration: BoxDecoration(
                           color: isDark
                               ? const Color(0xFF1A1B2E)
@@ -131,7 +131,7 @@ class _HomeScreenState extends State<HomeScreen>
                     ],
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 4),
 
                 // Game Section Segmented Control Switcher
                 Padding(
@@ -151,23 +151,31 @@ class _HomeScreenState extends State<HomeScreen>
                             title: 'Word Search',
                             icon: Icons.grid_on_rounded,
                             isSelected: isWordSearch,
+                            selectedColor: const Color(0xFF6C63FF),
                             onTap: () {
                               setState(() {
                                 _selectedSection = GameSection.wordSearch;
                               });
+                              _logoController
+                                ..reset()
+                                ..forward();
                             },
                             isDark: isDark,
                           ),
                         ),
                         Expanded(
                           child: _SectionTab(
-                            title: 'Jumbled Words',
-                            icon: Icons.shuffle_rounded,
+                            title: 'Sudoku',
+                            icon: Icons.grid_4x4_rounded,
                             isSelected: !isWordSearch,
+                            selectedColor: const Color(0xFF3A86FF),
                             onTap: () {
                               setState(() {
-                                _selectedSection = GameSection.jumbledWords;
+                                _selectedSection = GameSection.sudoku;
                               });
+                              _logoController
+                                ..reset()
+                                ..forward();
                             },
                             isDark: isDark,
                           ),
@@ -179,7 +187,7 @@ class _HomeScreenState extends State<HomeScreen>
 
                 const Spacer(),
 
-                // Animated Title & Logo for selected Game Section
+                // Animated Title & Logo for selected section
                 AnimatedBuilder(
                   animation: _logoController,
                   builder: (_, __) => FadeTransition(
@@ -205,12 +213,12 @@ class _HomeScreenState extends State<HomeScreen>
                                           ])
                                     : (isDark
                                         ? [
-                                            const Color(0xFF00C9A7),
-                                            const Color(0xFF3A86FF)
+                                            const Color(0xFF3A86FF),
+                                            const Color(0xFF8B84FF)
                                           ]
                                         : [
-                                            const Color(0xFF00C9A7),
-                                            const Color(0xFF8338EC)
+                                            const Color(0xFF3A86FF),
+                                            const Color(0xFF6C63FF)
                                           ]),
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
@@ -218,7 +226,9 @@ class _HomeScreenState extends State<HomeScreen>
                               borderRadius: BorderRadius.circular(28),
                               boxShadow: [
                                 BoxShadow(
-                                  color: AppTheme.primaryLight
+                                  color: (isWordSearch
+                                          ? AppTheme.primaryLight
+                                          : const Color(0xFF3A86FF))
                                       .withValues(alpha: 0.4),
                                   blurRadius: 24,
                                   offset: const Offset(0, 8),
@@ -229,7 +239,7 @@ class _HomeScreenState extends State<HomeScreen>
                               child: Icon(
                                 isWordSearch
                                     ? Icons.search_rounded
-                                    : Icons.text_fields_rounded,
+                                    : Icons.grid_4x4_rounded,
                                 color: Colors.white,
                                 size: 52,
                               ),
@@ -237,7 +247,7 @@ class _HomeScreenState extends State<HomeScreen>
                           ),
                           const SizedBox(height: 20),
                           Text(
-                            isWordSearch ? 'Word Search' : 'Jumbled Words',
+                            isWordSearch ? 'Word Search' : 'Sudoku',
                             style: TextStyle(
                               fontSize: 34,
                               fontWeight: FontWeight.w800,
@@ -248,11 +258,12 @@ class _HomeScreenState extends State<HomeScreen>
                           ),
                           const SizedBox(height: 6),
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 32),
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 32),
                             child: Text(
                               isWordSearch
                                   ? 'Find all hidden words in the letter grid!'
-                                  : 'Unscramble letters to reveal target words!',
+                                  : 'Fill the 9×9 grid — no repeats in rows, columns or boxes!',
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 15,
@@ -281,13 +292,14 @@ class _HomeScreenState extends State<HomeScreen>
                         icon: Icons.play_arrow_rounded,
                         gradientColors: isWordSearch
                             ? const [Color(0xFF6C63FF), Color(0xFF00C9A7)]
-                            : const [Color(0xFF00C9A7), Color(0xFF3A86FF)],
+                            : const [Color(0xFF3A86FF), Color(0xFF6C63FF)],
                         onTap: () {
                           if (isWordSearch) {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => GameScreen(level: currentLevel),
+                                builder: (_) =>
+                                    GameScreen(level: currentLevel),
                               ),
                             );
                           } else {
@@ -295,7 +307,7 @@ class _HomeScreenState extends State<HomeScreen>
                               context,
                               MaterialPageRoute(
                                 builder: (_) =>
-                                    JumbledGameScreen(level: currentLevel),
+                                    SudokuGameScreen(level: currentLevel),
                               ),
                             );
                           }
@@ -305,6 +317,9 @@ class _HomeScreenState extends State<HomeScreen>
                       _OutlinedActionButton(
                         label: '1,000 Levels',
                         icon: Icons.grid_view_rounded,
+                        color: isWordSearch
+                            ? const Color(0xFF6C63FF)
+                            : const Color(0xFF3A86FF),
                         onTap: () {
                           if (isWordSearch) {
                             Navigator.push(
@@ -317,7 +332,7 @@ class _HomeScreenState extends State<HomeScreen>
                               context,
                               MaterialPageRoute(
                                   builder: (_) =>
-                                      const JumbledLevelSelectScreen()),
+                                      const SudokuLevelSelectScreen()),
                             );
                           }
                         },
@@ -335,7 +350,7 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
-  Widget _buildBg(bool isDark) {
+  Widget _buildBg(bool isDark, bool isWordSearch) {
     return Positioned.fill(
       child: IgnorePointer(
         child: Stack(
@@ -344,9 +359,13 @@ class _HomeScreenState extends State<HomeScreen>
               top: -60,
               left: -60,
               child: _Blob(
-                color: isDark
-                    ? const Color(0xFF8B84FF)
-                    : const Color(0xFF6C63FF),
+                color: isWordSearch
+                    ? (isDark
+                        ? const Color(0xFF8B84FF)
+                        : const Color(0xFF6C63FF))
+                    : (isDark
+                        ? const Color(0xFF3A86FF)
+                        : const Color(0xFF3A86FF)),
                 size: 220,
                 opacity: 0.12,
               ),
@@ -355,9 +374,13 @@ class _HomeScreenState extends State<HomeScreen>
               bottom: -80,
               right: -60,
               child: _Blob(
-                color: isDark
-                    ? const Color(0xFF00E5BE)
-                    : const Color(0xFF00C9A7),
+                color: isWordSearch
+                    ? (isDark
+                        ? const Color(0xFF00E5BE)
+                        : const Color(0xFF00C9A7))
+                    : (isDark
+                        ? const Color(0xFF8B84FF)
+                        : const Color(0xFF6C63FF)),
                 size: 260,
                 opacity: 0.10,
               ),
@@ -373,6 +396,7 @@ class _SectionTab extends StatelessWidget {
   final String title;
   final IconData icon;
   final bool isSelected;
+  final Color selectedColor;
   final VoidCallback onTap;
   final bool isDark;
 
@@ -380,6 +404,7 @@ class _SectionTab extends StatelessWidget {
     required this.title,
     required this.icon,
     required this.isSelected,
+    required this.selectedColor,
     required this.onTap,
     required this.isDark,
   });
@@ -393,7 +418,7 @@ class _SectionTab extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 10),
         decoration: BoxDecoration(
           color: isSelected
-              ? (isDark ? const Color(0xFF6C63FF) : Colors.white)
+              ? (isDark ? selectedColor : Colors.white)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
           boxShadow: isSelected
@@ -413,7 +438,7 @@ class _SectionTab extends StatelessWidget {
               icon,
               size: 18,
               color: isSelected
-                  ? (isDark ? Colors.white : const Color(0xFF6C63FF))
+                  ? (isDark ? Colors.white : selectedColor)
                   : (isDark ? Colors.white60 : Colors.black54),
             ),
             const SizedBox(width: 6),
@@ -423,7 +448,7 @@ class _SectionTab extends StatelessWidget {
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
                 color: isSelected
-                    ? (isDark ? Colors.white : const Color(0xFF6C63FF))
+                    ? (isDark ? Colors.white : selectedColor)
                     : (isDark ? Colors.white60 : Colors.black54),
               ),
             ),
@@ -439,7 +464,8 @@ class _Blob extends StatelessWidget {
   final double size;
   final double opacity;
 
-  const _Blob({required this.color, required this.size, required this.opacity});
+  const _Blob(
+      {required this.color, required this.size, required this.opacity});
 
   @override
   Widget build(BuildContext context) {
@@ -508,17 +534,22 @@ class _GradientButton extends StatelessWidget {
 class _OutlinedActionButton extends StatelessWidget {
   final String label;
   final IconData icon;
+  final Color color;
   final VoidCallback onTap;
   final bool isDark;
 
-  const _OutlinedActionButton(
-      {required this.label,
-      required this.icon,
-      required this.onTap,
-      required this.isDark});
+  const _OutlinedActionButton({
+    required this.label,
+    required this.icon,
+    required this.color,
+    required this.onTap,
+    required this.isDark,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final btnColor =
+        isDark ? color.withValues(alpha: 0.8) : color;
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -526,27 +557,17 @@ class _OutlinedActionButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.transparent,
           borderRadius: BorderRadius.circular(18),
-          border: Border.all(
-            color:
-                isDark ? const Color(0xFF8B84FF) : const Color(0xFF6C63FF),
-            width: 2,
-          ),
+          border: Border.all(color: btnColor, width: 2),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon,
-                color: isDark
-                    ? const Color(0xFF8B84FF)
-                    : const Color(0xFF6C63FF),
-                size: 22),
+            Icon(icon, color: btnColor, size: 22),
             const SizedBox(width: 10),
             Text(
               label,
               style: TextStyle(
-                color: isDark
-                    ? const Color(0xFF8B84FF)
-                    : const Color(0xFF6C63FF),
+                color: btnColor,
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
               ),

@@ -4,30 +4,40 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'logic/ad_helper.dart';
 import 'providers/game_provider.dart';
-import 'providers/jumbled_game_provider.dart';
+import 'providers/sudoku_game_provider.dart';
 import 'providers/progress_provider.dart';
 import 'screens/home_screen.dart';
 import 'utils/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await AdHelper.init();
+
+  // Initialize ads asynchronously so app startup is never blocked
+  AdHelper.init();
 
   // Lock to portrait
-  await SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
-  ]);
+  try {
+    await SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+  } catch (e) {
+    debugPrint('Failed to set preferred orientations: $e');
+  }
 
   final progressProvider = ProgressProvider();
-  await progressProvider.load();
+  try {
+    await progressProvider.load();
+  } catch (e) {
+    debugPrint('Failed to load progress provider: $e');
+  }
 
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider.value(value: progressProvider),
         ChangeNotifierProvider(create: (_) => GameProvider()),
-        ChangeNotifierProvider(create: (_) => JumbledGameProvider()),
+        ChangeNotifierProvider(create: (_) => SudokuGameProvider()),
       ],
       child: const WordSearchApp(),
     ),

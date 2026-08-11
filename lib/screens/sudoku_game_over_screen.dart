@@ -1,26 +1,26 @@
-// Screens: JumbledGameOverScreen — time's up screen for Jumbled Words mode
+// Screens: SudokuGameOverScreen — time's up screen for Sudoku mode
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../logic/ad_helper.dart';
-import '../providers/jumbled_game_provider.dart';
 import '../providers/progress_provider.dart';
-import 'jumbled_game_screen.dart';
+import '../providers/sudoku_game_provider.dart';
+import 'sudoku_game_screen.dart';
 
-class JumbledGameOverScreen extends StatefulWidget {
+class SudokuGameOverScreen extends StatefulWidget {
   final int level;
   final int timeLimit;
 
-  const JumbledGameOverScreen({
+  const SudokuGameOverScreen({
     super.key,
     required this.level,
     required this.timeLimit,
   });
 
   @override
-  State<JumbledGameOverScreen> createState() => _JumbledGameOverScreenState();
+  State<SudokuGameOverScreen> createState() => _SudokuGameOverScreenState();
 }
 
-class _JumbledGameOverScreenState extends State<JumbledGameOverScreen>
+class _SudokuGameOverScreenState extends State<SudokuGameOverScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _shake;
@@ -39,7 +39,8 @@ class _JumbledGameOverScreenState extends State<JumbledGameOverScreen>
       TweenSequenceItem(tween: Tween(begin: 10, end: -8), weight: 2),
       TweenSequenceItem(tween: Tween(begin: -8, end: 8), weight: 2),
       TweenSequenceItem(tween: Tween(begin: 8, end: 0), weight: 1),
-    ]).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+    ]).animate(
+        CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
     _fade = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _controller,
@@ -71,7 +72,7 @@ class _JumbledGameOverScreenState extends State<JumbledGameOverScreen>
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Spacer(),
-                // Animated icon
+                // Animated shake icon
                 AnimatedBuilder(
                   animation: _shake,
                   builder: (_, child) => Transform.translate(
@@ -113,7 +114,7 @@ class _JumbledGameOverScreenState extends State<JumbledGameOverScreen>
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'You ran out of time on Jumbled Level ${widget.level}.',
+                  'You ran out of time on Sudoku Level ${widget.level}.',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 15,
@@ -123,10 +124,10 @@ class _JumbledGameOverScreenState extends State<JumbledGameOverScreen>
                   ),
                 ),
                 const SizedBox(height: 20),
-                // Deducted Stars Badge
+                // Deducted stars badge
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 20, vertical: 10),
                   decoration: BoxDecoration(
                     color: const Color(0xFFFF6B6B).withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(20),
@@ -151,10 +152,10 @@ class _JumbledGameOverScreenState extends State<JumbledGameOverScreen>
                   ),
                 ),
                 const SizedBox(height: 14),
-                // Total Stars Chip
+                // Total Sudoku stars chip
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 18, vertical: 10),
                   decoration: BoxDecoration(
                     color: isDark
                         ? const Color(0xFF242540)
@@ -178,7 +179,7 @@ class _JumbledGameOverScreenState extends State<JumbledGameOverScreen>
                         ),
                       ),
                       Text(
-                        '${progress.jumbledTotalStars}',
+                        '${progress.totalStars}',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w800,
@@ -191,16 +192,17 @@ class _JumbledGameOverScreenState extends State<JumbledGameOverScreen>
                   ),
                 ),
                 const Spacer(),
-                // Retry button with Rewarded Video Ad
+                // Watch Ad to Retry (rewarded ad — same as Word Search)
                 GestureDetector(
                   onTap: () {
                     AdHelper.showRewardedAd(
                       onRewardGranted: () {
-                        context.read<JumbledGameProvider>().reset();
+                        context.read<SudokuGameProvider>().reset();
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => JumbledGameScreen(level: widget.level),
+                            builder: (_) =>
+                                SudokuGameScreen(level: widget.level),
                           ),
                         );
                       },
@@ -242,8 +244,9 @@ class _JumbledGameOverScreenState extends State<JumbledGameOverScreen>
                 const SizedBox(height: 14),
                 TextButton(
                   onPressed: () {
-                    context.read<JumbledGameProvider>().reset();
-                    Navigator.of(context).popUntil((route) => route.isFirst);
+                    context.read<SudokuGameProvider>().reset();
+                    Navigator.of(context)
+                        .popUntil((route) => route.isFirst);
                   },
                   child: Text(
                     'Back to Home',

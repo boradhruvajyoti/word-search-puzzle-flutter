@@ -25,9 +25,10 @@ class AppConstants {
   static const String prefHighestLevel = 'highest_level';
   static const String prefBestTimes = 'best_times';
   static const String prefTotalStars = 'total_stars';
-  static const String prefJumbledHighestLevel = 'jumbled_highest_level';
-  static const String prefJumbledBestTimes = 'jumbled_best_times';
-  static const String prefJumbledTotalStars = 'jumbled_total_stars';
+  static const String prefSudokuHighestLevel = 'sudoku_highest_level';
+  static const String prefSudokuBestTimes = 'sudoku_best_times';
+  static const String prefStarUnlockedLevels = 'star_unlocked_levels';
+  static const String prefSudokuStarUnlockedLevels = 'sudoku_star_unlocked_levels';
   static const String prefLanguage = 'selected_language';
   static const String prefSoundEnabled = 'sound_enabled';
   static const String prefDarkMode = 'dark_mode';
