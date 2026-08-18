@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/progress_provider.dart';
 import '../widgets/level_tile.dart';
+import '../widgets/retry_ad_dialog.dart';
 import '../widgets/unlock_level_dialog.dart';
 import 'sudoku_game_screen.dart';
 
@@ -92,12 +93,7 @@ class SudokuLevelSelectScreen extends StatelessWidget {
                 return LevelTile(
                   level: level,
                   isSudoku: true,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => SudokuGameScreen(level: level),
-                    ),
-                  ),
+                  onTap: () => _onLevelTap(context, progress, level),
                   onLockedTap: () =>
                       _showUnlockDialog(context, level),
                 );
@@ -107,6 +103,31 @@ class SudokuLevelSelectScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  void _onLevelTap(BuildContext context, ProgressProvider progress, int level) {
+    if (progress.isSudokuRetryAdRequired(level)) {
+      RetryAdDialog.show(
+        context,
+        level: level,
+        isSudoku: true,
+        onAdCompleted: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => SudokuGameScreen(level: level),
+            ),
+          );
+        },
+      );
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => SudokuGameScreen(level: level),
+        ),
+      );
+    }
   }
 
   Future<void> _showUnlockDialog(BuildContext context, int level) async {

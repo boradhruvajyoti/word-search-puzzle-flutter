@@ -1,13 +1,14 @@
+// Screens: CryptogramLevelSelectScreen — 1,000 level selection screen for Cryptograms
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/progress_provider.dart';
 import '../widgets/level_tile.dart';
 import '../widgets/retry_ad_dialog.dart';
 import '../widgets/unlock_level_dialog.dart';
-import 'game_screen.dart';
+import 'cryptogram_game_screen.dart';
 
-class LevelSelectScreen extends StatelessWidget {
-  const LevelSelectScreen({super.key});
+class CryptogramLevelSelectScreen extends StatelessWidget {
+  const CryptogramLevelSelectScreen({super.key});
 
   static const int totalLevels = 1000;
 
@@ -18,7 +19,7 @@ class LevelSelectScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Select Level'),
+        title: const Text('Cryptogram Levels'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
           onPressed: () => Navigator.pop(context),
@@ -39,11 +40,11 @@ class LevelSelectScreen extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.emoji_events_rounded,
-                      color: Color(0xFFFFBE0B), size: 22),
+                  const Icon(Icons.psychology_rounded,
+                      color: Color(0xFF8338EC), size: 22),
                   const SizedBox(width: 8),
                   Text(
-                    '${progress.completedLevelsCount} levels completed',
+                    '${progress.cryptogramCompletedLevelsCount} levels solved',
                     style: TextStyle(
                       fontWeight: FontWeight.w700,
                       fontSize: 14,
@@ -91,9 +92,9 @@ class LevelSelectScreen extends StatelessWidget {
                 final level = index + 1;
                 return LevelTile(
                   level: level,
+                  isCryptogram: true,
                   onTap: () => _onLevelTap(context, progress, level),
-                  onLockedTap: () =>
-                      _showUnlockDialog(context, level, isSudoku: false),
+                  onLockedTap: () => _showUnlockDialog(context, level),
                 );
               },
             ),
@@ -104,16 +105,16 @@ class LevelSelectScreen extends StatelessWidget {
   }
 
   void _onLevelTap(BuildContext context, ProgressProvider progress, int level) {
-    if (progress.isRetryAdRequired(level)) {
+    if (progress.isCryptogramRetryAdRequired(level)) {
       RetryAdDialog.show(
         context,
         level: level,
-        isSudoku: false,
+        isCryptogram: true,
         onAdCompleted: () {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => GameScreen(level: level),
+              builder: (_) => CryptogramGameScreen(level: level),
             ),
           );
         },
@@ -122,17 +123,13 @@ class LevelSelectScreen extends StatelessWidget {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (_) => GameScreen(level: level),
+          builder: (_) => CryptogramGameScreen(level: level),
         ),
       );
     }
   }
 
-  Future<void> _showUnlockDialog(
-    BuildContext context,
-    int level, {
-    required bool isSudoku,
-  }) async {
+  Future<void> _showUnlockDialog(BuildContext context, int level) async {
     final progress = context.read<ProgressProvider>();
     final cost = ProgressProvider.starCostToUnlock(level);
     final canAfford = progress.canAffordUnlock(level);
@@ -151,12 +148,12 @@ class LevelSelectScreen extends StatelessWidget {
 
     if (confirmed != true) return;
 
-    final success = await progress.unlockLevelWithStars(level);
+    final success = await progress.unlockCryptogramLevelWithStars(level);
     if (!success || !context.mounted) return;
 
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => GameScreen(level: level)),
+      MaterialPageRoute(builder: (_) => CryptogramGameScreen(level: level)),
     );
   }
 }

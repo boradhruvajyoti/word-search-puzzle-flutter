@@ -1,26 +1,27 @@
-// Screens: SudokuGameOverScreen — time's up screen for Sudoku mode
+// Screens: QuadsumGameOverScreen — time's up screen for Quadsum mode with 2 free attempts & rewarded ad retry
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../logic/ad_helper.dart';
 import '../providers/progress_provider.dart';
-import '../providers/sudoku_game_provider.dart';
-import 'sudoku_game_screen.dart';
+import '../providers/quadsum_game_provider.dart';
+import 'quadsum_game_screen.dart';
 
-class SudokuGameOverScreen extends StatefulWidget {
+class QuadsumGameOverScreen extends StatefulWidget {
   final int level;
   final int timeLimit;
 
-  const SudokuGameOverScreen({
+  const QuadsumGameOverScreen({
     super.key,
     required this.level,
     required this.timeLimit,
   });
 
   @override
-  State<SudokuGameOverScreen> createState() => _SudokuGameOverScreenState();
+  State<QuadsumGameOverScreen> createState() =>
+      _QuadsumGameOverScreenState();
 }
 
-class _SudokuGameOverScreenState extends State<SudokuGameOverScreen>
+class _QuadsumGameOverScreenState extends State<QuadsumGameOverScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _shake;
@@ -39,8 +40,7 @@ class _SudokuGameOverScreenState extends State<SudokuGameOverScreen>
       TweenSequenceItem(tween: Tween(begin: 10, end: -8), weight: 2),
       TweenSequenceItem(tween: Tween(begin: -8, end: 8), weight: 2),
       TweenSequenceItem(tween: Tween(begin: 8, end: 0), weight: 1),
-    ]).animate(
-        CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+    ]).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
     _fade = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _controller,
@@ -72,7 +72,7 @@ class _SudokuGameOverScreenState extends State<SudokuGameOverScreen>
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Spacer(),
-                // Animated shake icon
+                // Animated icon
                 AnimatedBuilder(
                   animation: _shake,
                   builder: (_, child) => Transform.translate(
@@ -114,20 +114,20 @@ class _SudokuGameOverScreenState extends State<SudokuGameOverScreen>
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'You ran out of time on Sudoku Level ${widget.level}.',
+                  'You ran out of time on Quadsum Level ${widget.level}.',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 15,
                     color: isDark
-                        ? const Color(0xFF8B84FF)
-                        : const Color(0xFF6C63FF),
+                        ? const Color(0xFF38BDF8)
+                        : const Color(0xFF0284C7),
                   ),
                 ),
                 const SizedBox(height: 20),
-                // Deducted stars badge
+                // Deducted Stars Badge
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 20, vertical: 10),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   decoration: BoxDecoration(
                     color: const Color(0xFFFF6B6B).withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(20),
@@ -152,10 +152,10 @@ class _SudokuGameOverScreenState extends State<SudokuGameOverScreen>
                   ),
                 ),
                 const SizedBox(height: 14),
-                // Total Sudoku stars chip
+                // Total Stars Chip
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 18, vertical: 10),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
                   decoration: BoxDecoration(
                     color: isDark
                         ? const Color(0xFF242540)
@@ -196,19 +196,19 @@ class _SudokuGameOverScreenState extends State<SudokuGameOverScreen>
                 Builder(
                   builder: (context) {
                     final isAdRequired =
-                        progress.isSudokuRetryAdRequired(widget.level);
+                        progress.isQuadsumRetryAdRequired(widget.level);
                     final freeRemaining =
-                        progress.sudokuRemainingFreeAttempts(widget.level);
+                        progress.quadsumRemainingFreeAttempts(widget.level);
 
                     return GestureDetector(
                       onTap: () {
                         void startRetry() {
-                          context.read<SudokuGameProvider>().reset();
+                          context.read<QuadsumGameProvider>().reset();
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
                               builder: (_) =>
-                                  SudokuGameScreen(level: widget.level),
+                                  QuadsumGameScreen(level: widget.level),
                             ),
                           );
                         }
@@ -228,7 +228,7 @@ class _SudokuGameOverScreenState extends State<SudokuGameOverScreen>
                           gradient: LinearGradient(
                             colors: isAdRequired
                                 ? const [Color(0xFFFF6B6B), Color(0xFFFF006E)]
-                                : const [Color(0xFF3A86FF), Color(0xFF6C63FF)],
+                                : const [Color(0xFF00B4D8), Color(0xFF06D6A0)],
                             begin: Alignment.centerLeft,
                             end: Alignment.centerRight,
                           ),
@@ -237,7 +237,7 @@ class _SudokuGameOverScreenState extends State<SudokuGameOverScreen>
                             BoxShadow(
                               color: (isAdRequired
                                       ? const Color(0xFFFF6B6B)
-                                      : const Color(0xFF3A86FF))
+                                      : const Color(0xFF00B4D8))
                                   .withValues(alpha: 0.4),
                               blurRadius: 18,
                               offset: const Offset(0, 6),
@@ -276,7 +276,7 @@ class _SudokuGameOverScreenState extends State<SudokuGameOverScreen>
                 const SizedBox(height: 14),
                 TextButton(
                   onPressed: () {
-                    context.read<SudokuGameProvider>().reset();
+                    context.read<QuadsumGameProvider>().reset();
                     Navigator.of(context)
                         .popUntil((route) => route.isFirst);
                   },
@@ -284,8 +284,8 @@ class _SudokuGameOverScreenState extends State<SudokuGameOverScreen>
                     'Back to Home',
                     style: TextStyle(
                       color: isDark
-                          ? const Color(0xFF8B84FF)
-                          : const Color(0xFF6C63FF),
+                          ? const Color(0xFF38BDF8)
+                          : const Color(0xFF0284C7),
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                     ),

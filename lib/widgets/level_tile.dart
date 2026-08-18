@@ -1,4 +1,4 @@
-// Widgets: LevelTile — a single level card with locked/unlocked/star-unlock state
+// Widgets: LevelTile — a single level card with locked/unlocked/star-unlock/retry-ad state
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/progress_provider.dart';
@@ -7,8 +7,10 @@ import '../utils/constants.dart';
 class LevelTile extends StatelessWidget {
   final int level;
   final bool isSudoku;
+  final bool isCryptogram;
+  final bool isQuadsum;
 
-  /// Called when an unlocked level is tapped — navigate to game.
+  /// Called when an unlocked level is tapped.
   final VoidCallback? onTap;
 
   /// Called when a locked level is tapped — show unlock dialog.
@@ -18,6 +20,8 @@ class LevelTile extends StatelessWidget {
     super.key,
     required this.level,
     this.isSudoku = false,
+    this.isCryptogram = false,
+    this.isQuadsum = false,
     this.onTap,
     this.onLockedTap,
   });
@@ -25,12 +29,27 @@ class LevelTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final progress = context.watch<ProgressProvider>();
-    final isUnlocked = isSudoku
-        ? progress.isSudokuLevelUnlocked(level)
-        : progress.isLevelUnlocked(level);
-    final bestTime = isSudoku
-        ? progress.sudokuBestTimeForLevel(level)
-        : progress.bestTimeForLevel(level);
+    final isUnlocked = isQuadsum
+        ? progress.isQuadsumLevelUnlocked(level)
+        : (isCryptogram
+            ? progress.isCryptogramLevelUnlocked(level)
+            : (isSudoku
+                ? progress.isSudokuLevelUnlocked(level)
+                : progress.isLevelUnlocked(level)));
+    final isRetryAd = isQuadsum
+        ? progress.isQuadsumRetryAdRequired(level)
+        : (isCryptogram
+            ? progress.isCryptogramRetryAdRequired(level)
+            : (isSudoku
+                ? progress.isSudokuRetryAdRequired(level)
+                : progress.isRetryAdRequired(level)));
+    final bestTime = isQuadsum
+        ? progress.quadsumBestTimeForLevel(level)
+        : (isCryptogram
+            ? progress.cryptogramBestTimeForLevel(level)
+            : (isSudoku
+                ? progress.sudokuBestTimeForLevel(level)
+                : progress.bestTimeForLevel(level)));
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final cost = ProgressProvider.starCostToUnlock(level);
     final canAfford = progress.canAffordUnlock(level);
@@ -146,6 +165,31 @@ class LevelTile extends StatelessWidget {
                 ],
               ),
             ),
+            // Retry Ad Required Badge indicator on top-right
+            if (isUnlocked && isRetryAd)
+              Positioned(
+                top: 4,
+                right: 4,
+                child: Container(
+                  padding: const EdgeInsets.all(3),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFF006E),
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFFFF006E).withValues(alpha: 0.5),
+                        blurRadius: 4,
+                        offset: const Offset(0, 1),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(
+                    Icons.ondemand_video_rounded,
+                    color: Colors.white,
+                    size: 10,
+                  ),
+                ),
+              ),
           ],
         ),
       ),

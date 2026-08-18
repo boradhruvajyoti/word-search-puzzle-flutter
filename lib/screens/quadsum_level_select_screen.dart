@@ -1,13 +1,14 @@
+// Screens: QuadsumLevelSelectScreen — 1,000 level selection grid for Quadsum mode
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/progress_provider.dart';
 import '../widgets/level_tile.dart';
 import '../widgets/retry_ad_dialog.dart';
 import '../widgets/unlock_level_dialog.dart';
-import 'game_screen.dart';
+import 'quadsum_game_screen.dart';
 
-class LevelSelectScreen extends StatelessWidget {
-  const LevelSelectScreen({super.key});
+class QuadsumLevelSelectScreen extends StatelessWidget {
+  const QuadsumLevelSelectScreen({super.key});
 
   static const int totalLevels = 1000;
 
@@ -18,7 +19,7 @@ class LevelSelectScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Select Level'),
+        title: const Text('Quadsum Levels'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
           onPressed: () => Navigator.pop(context),
@@ -34,16 +35,16 @@ class LevelSelectScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 color: isDark
                     ? const Color(0xFF1A1B2E)
-                    : const Color(0xFFF0F2FF),
+                    : const Color(0xFFF1F5F9),
                 borderRadius: BorderRadius.circular(14),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.emoji_events_rounded,
-                      color: Color(0xFFFFBE0B), size: 22),
+                  const Icon(Icons.calculate_rounded,
+                      color: Color(0xFF00B4D8), size: 22),
                   const SizedBox(width: 8),
                   Text(
-                    '${progress.completedLevelsCount} levels completed',
+                    '${progress.quadsumCompletedLevelsCount} levels solved',
                     style: TextStyle(
                       fontWeight: FontWeight.w700,
                       fontSize: 14,
@@ -91,9 +92,9 @@ class LevelSelectScreen extends StatelessWidget {
                 final level = index + 1;
                 return LevelTile(
                   level: level,
+                  isQuadsum: true,
                   onTap: () => _onLevelTap(context, progress, level),
-                  onLockedTap: () =>
-                      _showUnlockDialog(context, level, isSudoku: false),
+                  onLockedTap: () => _showUnlockDialog(context, level),
                 );
               },
             ),
@@ -104,16 +105,16 @@ class LevelSelectScreen extends StatelessWidget {
   }
 
   void _onLevelTap(BuildContext context, ProgressProvider progress, int level) {
-    if (progress.isRetryAdRequired(level)) {
+    if (progress.isQuadsumRetryAdRequired(level)) {
       RetryAdDialog.show(
         context,
         level: level,
-        isSudoku: false,
+        isQuadsum: true,
         onAdCompleted: () {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => GameScreen(level: level),
+              builder: (_) => QuadsumGameScreen(level: level),
             ),
           );
         },
@@ -122,17 +123,13 @@ class LevelSelectScreen extends StatelessWidget {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (_) => GameScreen(level: level),
+          builder: (_) => QuadsumGameScreen(level: level),
         ),
       );
     }
   }
 
-  Future<void> _showUnlockDialog(
-    BuildContext context,
-    int level, {
-    required bool isSudoku,
-  }) async {
+  Future<void> _showUnlockDialog(BuildContext context, int level) async {
     final progress = context.read<ProgressProvider>();
     final cost = ProgressProvider.starCostToUnlock(level);
     final canAfford = progress.canAffordUnlock(level);
@@ -151,12 +148,12 @@ class LevelSelectScreen extends StatelessWidget {
 
     if (confirmed != true) return;
 
-    final success = await progress.unlockLevelWithStars(level);
+    final success = await progress.unlockQuadsumLevelWithStars(level);
     if (!success || !context.mounted) return;
 
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => GameScreen(level: level)),
+      MaterialPageRoute(builder: (_) => QuadsumGameScreen(level: level)),
     );
   }
 }

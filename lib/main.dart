@@ -5,6 +5,8 @@ import 'package:provider/provider.dart';
 import 'logic/ad_helper.dart';
 import 'providers/game_provider.dart';
 import 'providers/sudoku_game_provider.dart';
+import 'providers/cryptogram_game_provider.dart';
+import 'providers/quadsum_game_provider.dart';
 import 'providers/progress_provider.dart';
 import 'screens/home_screen.dart';
 import 'utils/app_theme.dart';
@@ -38,6 +40,8 @@ void main() async {
         ChangeNotifierProvider.value(value: progressProvider),
         ChangeNotifierProvider(create: (_) => GameProvider()),
         ChangeNotifierProvider(create: (_) => SudokuGameProvider()),
+        ChangeNotifierProvider(create: (_) => CryptogramGameProvider()),
+        ChangeNotifierProvider(create: (_) => QuadsumGameProvider()),
       ],
       child: const WordSearchApp(),
     ),

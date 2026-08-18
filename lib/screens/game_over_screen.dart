@@ -191,52 +191,83 @@ class _GameOverScreenState extends State<GameOverScreen>
                   ),
                 ),
                 const Spacer(),
-                // Retry
-                GestureDetector(
-                  onTap: () {
-                    AdHelper.showRewardedAd(
-                      onRewardGranted: () {
-                        context.read<GameProvider>().reset();
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => GameScreen(level: widget.level),
-                          ),
-                        );
+                // Retry Button
+                Builder(
+                  builder: (context) {
+                    final isAdRequired = progress.isRetryAdRequired(widget.level);
+                    final freeRemaining = progress.remainingFreeAttempts(widget.level);
+
+                    return GestureDetector(
+                      onTap: () {
+                        void startRetry() {
+                          context.read<GameProvider>().reset();
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => GameScreen(level: widget.level),
+                            ),
+                          );
+                        }
+
+                        if (isAdRequired) {
+                          AdHelper.showRewardedAd(
+                            onRewardGranted: startRetry,
+                            onAdClosed: () {},
+                          );
+                        } else {
+                          startRetry();
+                        }
                       },
-                      onAdClosed: () {},
-                    );
-                  },
-                  child: Container(
-                    height: 60,
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFFFF6B6B), Color(0xFFFF006E)],
-                        begin: Alignment.centerLeft,
-                        end: Alignment.centerRight,
-                      ),
-                      borderRadius: BorderRadius.circular(18),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFFFF6B6B).withValues(alpha: 0.4),
-                          blurRadius: 18,
-                          offset: const Offset(0, 6),
+                      child: Container(
+                        height: 60,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: isAdRequired
+                                ? const [Color(0xFFFF6B6B), Color(0xFFFF006E)]
+                                : const [Color(0xFF6C63FF), Color(0xFF00C9A7)],
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                          ),
+                          borderRadius: BorderRadius.circular(18),
+                          boxShadow: [
+                            BoxShadow(
+                              color: (isAdRequired
+                                      ? const Color(0xFFFF6B6B)
+                                      : const Color(0xFF6C63FF))
+                                  .withValues(alpha: 0.4),
+                              blurRadius: 18,
+                              offset: const Offset(0, 6),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.ondemand_video_rounded, color: Colors.white, size: 26),
-                        SizedBox(width: 10),
-                        Text('Watch Ad to Retry',
-                            style: TextStyle(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              isAdRequired
+                                  ? Icons.ondemand_video_rounded
+                                  : Icons.replay_rounded,
+                              color: Colors.white,
+                              size: 26,
+                            ),
+                            const SizedBox(width: 10),
+                            Text(
+                              isAdRequired
+                                  ? 'Watch Ad to Retry'
+                                  : (freeRemaining > 0
+                                      ? 'Retry ($freeRemaining Free Left)'
+                                      : 'Retry Level'),
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 18,
-                                fontWeight: FontWeight.w800)),
-                      ],
-                    ),
-                  ),
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
                 ),
                 const SizedBox(height: 14),
                 TextButton(

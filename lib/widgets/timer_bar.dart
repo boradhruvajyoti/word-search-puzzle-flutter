@@ -6,14 +6,21 @@ import '../utils/app_theme.dart';
 import '../utils/extensions.dart';
 
 class TimerBar extends StatelessWidget {
-  const TimerBar({super.key});
+  final int? timeRemaining;
+  final int? totalTime;
+
+  const TimerBar({
+    super.key,
+    this.timeRemaining,
+    this.totalTime,
+  });
 
   @override
   Widget build(BuildContext context) {
     final game = context.watch<GameProvider>();
-    final timeLimit = game.config?.timeLimit ?? 1;
-    final remaining = game.timeRemaining;
-    final ratio = (remaining / timeLimit).clamp(0.0, 1.0);
+    final limit = totalTime ?? game.config?.timeLimit ?? 1;
+    final remaining = timeRemaining ?? game.timeRemaining;
+    final ratio = (remaining / limit).clamp(0.0, 1.0);
 
     final Color barColor;
     if (ratio > 0.5) {
