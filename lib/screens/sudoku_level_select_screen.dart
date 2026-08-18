@@ -61,7 +61,7 @@ class SudokuLevelSelectScreen extends StatelessWidget {
                           color: Color(0xFFFFBE0B), size: 18),
                       const SizedBox(width: 4),
                       Text(
-                        '${progress.totalStars} Stars',
+                        '${progress.sudokuStars} Stars',
                         style: TextStyle(
                           fontWeight: FontWeight.w700,
                           fontSize: 13,
@@ -133,7 +133,7 @@ class SudokuLevelSelectScreen extends StatelessWidget {
   Future<void> _showUnlockDialog(BuildContext context, int level) async {
     final progress = context.read<ProgressProvider>();
     final cost = ProgressProvider.starCostToUnlock(level);
-    final canAfford = progress.canAffordUnlock(level);
+    final canAfford = progress.canAffordSudokuUnlock(level);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final confirmed = await showDialog<bool>(
@@ -141,7 +141,7 @@ class SudokuLevelSelectScreen extends StatelessWidget {
       builder: (ctx) => UnlockLevelDialog(
         level: level,
         cost: cost,
-        currentStars: progress.totalStars,
+        currentStars: progress.sudokuStars,
         canAfford: canAfford,
         isDark: isDark,
       ),

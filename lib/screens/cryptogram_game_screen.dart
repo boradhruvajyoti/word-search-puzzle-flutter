@@ -627,7 +627,7 @@ class _CryptogramStarInfoBar extends StatelessWidget {
               const Icon(Icons.stars_rounded, color: Color(0xFFFFBE0B), size: 18),
               const SizedBox(width: 4),
               Text(
-                '${progress.totalStars}',
+                '${progress.cryptogramStars}',
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w800,

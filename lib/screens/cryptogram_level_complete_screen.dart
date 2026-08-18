@@ -202,7 +202,7 @@ class _CryptogramLevelCompleteScreenState
                       const SizedBox(width: 12),
                       _InfoChip(
                         label: 'Total Stars',
-                        value: '${progress.totalStars}',
+                        value: '${progress.cryptogramStars}',
                         icon: Icons.stars_rounded,
                         isDark: isDark,
                       ),

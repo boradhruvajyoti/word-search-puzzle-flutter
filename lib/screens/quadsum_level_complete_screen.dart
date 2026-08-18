@@ -204,7 +204,7 @@ class _QuadsumLevelCompleteScreenState extends State<QuadsumLevelCompleteScreen>
                             Expanded(
                               child: _StatTile(
                                 label: 'Total Stars',
-                                value: '${progress.totalStars}',
+                                value: '${progress.quadsumStars}',
                                 icon: Icons.stars_rounded,
                                 iconColor: const Color(0xFFFFBE0B),
                                 isDark: isDark,

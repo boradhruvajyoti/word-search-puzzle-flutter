@@ -178,7 +178,7 @@ class _GameOverScreenState extends State<GameOverScreen>
                         ),
                       ),
                       Text(
-                        '${progress.totalStars}',
+                        '${progress.wordSearchStars}',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w800,
@@ -254,9 +254,7 @@ class _GameOverScreenState extends State<GameOverScreen>
                             Text(
                               isAdRequired
                                   ? 'Watch Ad to Retry'
-                                  : (freeRemaining > 0
-                                      ? 'Retry ($freeRemaining Free Left)'
-                                      : 'Retry Level'),
+                                  : 'Retry Level',
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 18,

@@ -27,8 +27,11 @@ class ProgressProvider extends ChangeNotifier {
   Set<int> _quadsumStarUnlockedLevels = {};
   Map<int, int> _quadsumFailedAttempts = {};
 
-  // Shared Star Economy
-  int _totalStars = 0;
+  // Per-Game Star Economies
+  int _wordSearchStars = 0;
+  int _sudokuStars = 0;
+  int _cryptogramStars = 0;
+  int _quadsumStars = 0;
 
   // General Settings
   String _languageCode = 'en';
@@ -49,6 +52,7 @@ class ProgressProvider extends ChangeNotifier {
 
   int get completedLevelsCount => _bestTimes.length;
   Map<int, int> get bestTimes => Map.unmodifiable(_bestTimes);
+  int get wordSearchStars => _wordSearchStars;
 
   // ── Getters — Sudoku ───────────────────────────────────────────────────────
   int get sudokuHighestUnlockedLevel {
@@ -64,6 +68,7 @@ class ProgressProvider extends ChangeNotifier {
 
   int get sudokuCompletedLevelsCount => _sudokuBestTimes.length;
   Map<int, int> get sudokuBestTimes => Map.unmodifiable(_sudokuBestTimes);
+  int get sudokuStars => _sudokuStars;
 
   // ── Getters — Cryptogram ───────────────────────────────────────────────────
   int get cryptogramHighestUnlockedLevel {
@@ -79,6 +84,7 @@ class ProgressProvider extends ChangeNotifier {
 
   int get cryptogramCompletedLevelsCount => _cryptogramBestTimes.length;
   Map<int, int> get cryptogramBestTimes => Map.unmodifiable(_cryptogramBestTimes);
+  int get cryptogramStars => _cryptogramStars;
 
   // ── Getters — Quadsum ──────────────────────────────────────────────────────
   int get quadsumHighestUnlockedLevel {
@@ -94,9 +100,11 @@ class ProgressProvider extends ChangeNotifier {
 
   int get quadsumCompletedLevelsCount => _quadsumBestTimes.length;
   Map<int, int> get quadsumBestTimes => Map.unmodifiable(_quadsumBestTimes);
+  int get quadsumStars => _quadsumStars;
 
-  // ── Getters — Shared ───────────────────────────────────────────────────────
-  int get totalStars => _totalStars;
+  // ── Getters — Shared / Total ───────────────────────────────────────────────
+  int get totalStars =>
+      _wordSearchStars + _sudokuStars + _cryptogramStars + _quadsumStars;
 
   // ── Getters — Settings ─────────────────────────────────────────────────────
   String get languageCode => _languageCode;
@@ -184,47 +192,59 @@ class ProgressProvider extends ChangeNotifier {
   /// Stars required to unlock [level] = level × 5.
   static int starCostToUnlock(int level) => level * 5;
 
-  /// Whether the user has enough stars to unlock [level].
-  bool canAffordUnlock(int level) => _totalStars >= starCostToUnlock(level);
+  /// Whether the user has enough Word Search stars to unlock [level].
+  bool canAffordUnlock(int level) => _wordSearchStars >= starCostToUnlock(level);
 
-  /// Spends stars to unlock a locked Word Search level.
+  /// Spends Word Search stars to unlock a locked Word Search level.
   Future<bool> unlockLevelWithStars(int level) async {
     final cost = starCostToUnlock(level);
-    if (_totalStars < cost) return false;
-    _totalStars -= cost;
+    if (_wordSearchStars < cost) return false;
+    _wordSearchStars -= cost;
     _starUnlockedLevels.add(level);
     await _persist();
     notifyListeners();
     return true;
   }
 
-  /// Spends stars to unlock a locked Sudoku level.
+  /// Whether the user has enough Sudoku stars to unlock [level].
+  bool canAffordSudokuUnlock(int level) =>
+      _sudokuStars >= starCostToUnlock(level);
+
+  /// Spends Sudoku stars to unlock a locked Sudoku level.
   Future<bool> unlockSudokuLevelWithStars(int level) async {
     final cost = starCostToUnlock(level);
-    if (_totalStars < cost) return false;
-    _totalStars -= cost;
+    if (_sudokuStars < cost) return false;
+    _sudokuStars -= cost;
     _sudokuStarUnlockedLevels.add(level);
     await _persist();
     notifyListeners();
     return true;
   }
 
-  /// Spends stars to unlock a locked Cryptogram level.
+  /// Whether the user has enough Cryptogram stars to unlock [level].
+  bool canAffordCryptogramUnlock(int level) =>
+      _cryptogramStars >= starCostToUnlock(level);
+
+  /// Spends Cryptogram stars to unlock a locked Cryptogram level.
   Future<bool> unlockCryptogramLevelWithStars(int level) async {
     final cost = starCostToUnlock(level);
-    if (_totalStars < cost) return false;
-    _totalStars -= cost;
+    if (_cryptogramStars < cost) return false;
+    _cryptogramStars -= cost;
     _cryptogramStarUnlockedLevels.add(level);
     await _persist();
     notifyListeners();
     return true;
   }
 
-  /// Spends stars to unlock a locked Quadsum level.
+  /// Whether the user has enough Quadsum stars to unlock [level].
+  bool canAffordQuadsumUnlock(int level) =>
+      _quadsumStars >= starCostToUnlock(level);
+
+  /// Spends Quadsum stars to unlock a locked Quadsum level.
   Future<bool> unlockQuadsumLevelWithStars(int level) async {
     final cost = starCostToUnlock(level);
-    if (_totalStars < cost) return false;
-    _totalStars -= cost;
+    if (_quadsumStars < cost) return false;
+    _quadsumStars -= cost;
     _quadsumStarUnlockedLevels.add(level);
     await _persist();
     notifyListeners();
@@ -235,8 +255,13 @@ class ProgressProvider extends ChangeNotifier {
   Future<void> load() async {
     final prefs = await SharedPreferences.getInstance();
 
-    // Shared stars
-    _totalStars = prefs.getInt(AppConstants.prefTotalStars) ?? 0;
+    // Stars per game (with fallback to total_stars for existing word search progress)
+    _wordSearchStars = prefs.getInt(AppConstants.prefWordSearchStars) ??
+        prefs.getInt(AppConstants.prefTotalStars) ??
+        0;
+    _sudokuStars = prefs.getInt(AppConstants.prefSudokuStars) ?? 0;
+    _cryptogramStars = prefs.getInt(AppConstants.prefCryptogramStars) ?? 0;
+    _quadsumStars = prefs.getInt(AppConstants.prefQuadsumStars) ?? 0;
 
     // Word Search
     final bestTimesJson = prefs.getString(AppConstants.prefBestTimes);
@@ -354,7 +379,7 @@ class ProgressProvider extends ChangeNotifier {
     if (existing == null || timeRemaining > existing) {
       _bestTimes[level] = timeRemaining;
     }
-    _totalStars += timeRemaining;
+    _wordSearchStars += timeRemaining;
     _failedAttempts.remove(level);
     await _persist();
     notifyListeners();
@@ -362,7 +387,7 @@ class ProgressProvider extends ChangeNotifier {
 
   /// Called when a user fails a Word Search level.
   Future<void> failLevel(int level, int timeLimit) async {
-    _totalStars = (_totalStars - timeLimit).clamp(0, 9999999);
+    _wordSearchStars = (_wordSearchStars - timeLimit).clamp(0, 9999999);
     _failedAttempts[level] = (_failedAttempts[level] ?? 0) + 1;
     await _persist();
     notifyListeners();
@@ -374,7 +399,7 @@ class ProgressProvider extends ChangeNotifier {
     if (existing == null || timeRemaining > existing) {
       _sudokuBestTimes[level] = timeRemaining;
     }
-    _totalStars += timeRemaining;
+    _sudokuStars += timeRemaining;
     _sudokuFailedAttempts.remove(level);
     await _persist();
     notifyListeners();
@@ -382,7 +407,7 @@ class ProgressProvider extends ChangeNotifier {
 
   /// Called when a user fails a Sudoku level.
   Future<void> failSudokuLevel(int level, int timeLimit) async {
-    _totalStars = (_totalStars - timeLimit).clamp(0, 9999999);
+    _sudokuStars = (_sudokuStars - timeLimit).clamp(0, 9999999);
     _sudokuFailedAttempts[level] = (_sudokuFailedAttempts[level] ?? 0) + 1;
     await _persist();
     notifyListeners();
@@ -394,7 +419,7 @@ class ProgressProvider extends ChangeNotifier {
     if (existing == null || timeRemaining > existing) {
       _cryptogramBestTimes[level] = timeRemaining;
     }
-    _totalStars += timeRemaining;
+    _cryptogramStars += timeRemaining;
     _cryptogramFailedAttempts.remove(level);
     await _persist();
     notifyListeners();
@@ -402,7 +427,7 @@ class ProgressProvider extends ChangeNotifier {
 
   /// Called when a user fails a Cryptogram level.
   Future<void> failCryptogramLevel(int level, int timeLimit) async {
-    _totalStars = (_totalStars - timeLimit).clamp(0, 9999999);
+    _cryptogramStars = (_cryptogramStars - timeLimit).clamp(0, 9999999);
     _cryptogramFailedAttempts[level] = (_cryptogramFailedAttempts[level] ?? 0) + 1;
     await _persist();
     notifyListeners();
@@ -414,7 +439,7 @@ class ProgressProvider extends ChangeNotifier {
     if (existing == null || timeRemaining > existing) {
       _quadsumBestTimes[level] = timeRemaining;
     }
-    _totalStars += timeRemaining;
+    _quadsumStars += timeRemaining;
     _quadsumFailedAttempts.remove(level);
     await _persist();
     notifyListeners();
@@ -422,7 +447,7 @@ class ProgressProvider extends ChangeNotifier {
 
   /// Called when a user fails a Quadsum level.
   Future<void> failQuadsumLevel(int level, int timeLimit) async {
-    _totalStars = (_totalStars - timeLimit).clamp(0, 9999999);
+    _quadsumStars = (_quadsumStars - timeLimit).clamp(0, 9999999);
     _quadsumFailedAttempts[level] = (_quadsumFailedAttempts[level] ?? 0) + 1;
     await _persist();
     notifyListeners();
@@ -454,39 +479,46 @@ class ProgressProvider extends ChangeNotifier {
     _bestTimes = {};
     _starUnlockedLevels = {};
     _failedAttempts = {};
-    _totalStars = 0;
+    _wordSearchStars = 0;
 
     _sudokuBestTimes = {};
     _sudokuStarUnlockedLevels = {};
     _sudokuFailedAttempts = {};
+    _sudokuStars = 0;
 
     _cryptogramBestTimes = {};
     _cryptogramStarUnlockedLevels = {};
     _cryptogramFailedAttempts = {};
+    _cryptogramStars = 0;
 
     _quadsumBestTimes = {};
     _quadsumStarUnlockedLevels = {};
     _quadsumFailedAttempts = {};
+    _quadsumStars = 0;
 
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(AppConstants.prefHighestLevel);
     await prefs.remove(AppConstants.prefBestTimes);
     await prefs.remove(AppConstants.prefTotalStars);
+    await prefs.remove(AppConstants.prefWordSearchStars);
     await prefs.remove(AppConstants.prefStarUnlockedLevels);
     await prefs.remove(AppConstants.prefRetryAdLevels);
 
     await prefs.remove(AppConstants.prefSudokuHighestLevel);
     await prefs.remove(AppConstants.prefSudokuBestTimes);
+    await prefs.remove(AppConstants.prefSudokuStars);
     await prefs.remove(AppConstants.prefSudokuStarUnlockedLevels);
     await prefs.remove(AppConstants.prefSudokuRetryAdLevels);
 
     await prefs.remove(AppConstants.prefCryptogramHighestLevel);
     await prefs.remove(AppConstants.prefCryptogramBestTimes);
+    await prefs.remove(AppConstants.prefCryptogramStars);
     await prefs.remove(AppConstants.prefCryptogramStarUnlockedLevels);
     await prefs.remove(AppConstants.prefCryptogramRetryAdLevels);
 
     await prefs.remove(AppConstants.prefQuadsumHighestLevel);
     await prefs.remove(AppConstants.prefQuadsumBestTimes);
+    await prefs.remove(AppConstants.prefQuadsumStars);
     await prefs.remove(AppConstants.prefQuadsumStarUnlockedLevels);
     await prefs.remove(AppConstants.prefQuadsumRetryAdLevels);
 
@@ -496,8 +528,12 @@ class ProgressProvider extends ChangeNotifier {
   Future<void> _persist() async {
     final prefs = await SharedPreferences.getInstance();
 
-    // Shared stars
-    await prefs.setInt(AppConstants.prefTotalStars, _totalStars);
+    // Per-game stars & total
+    await prefs.setInt(AppConstants.prefWordSearchStars, _wordSearchStars);
+    await prefs.setInt(AppConstants.prefSudokuStars, _sudokuStars);
+    await prefs.setInt(AppConstants.prefCryptogramStars, _cryptogramStars);
+    await prefs.setInt(AppConstants.prefQuadsumStars, _quadsumStars);
+    await prefs.setInt(AppConstants.prefTotalStars, totalStars);
 
     // Word Search
     await prefs.setInt(AppConstants.prefHighestLevel, highestUnlockedLevel);

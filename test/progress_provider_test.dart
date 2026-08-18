@@ -22,13 +22,14 @@ void main() {
       expect(provider.isLevelUnlocked(50), isFalse);
 
       await provider.completeLevel(1, 300);
+      expect(provider.wordSearchStars, 300);
       expect(provider.totalStars, 300);
 
       expect(provider.canAffordUnlock(50), isTrue);
 
       final success = await provider.unlockLevelWithStars(50);
       expect(success, isTrue);
-      expect(provider.totalStars, 50);
+      expect(provider.wordSearchStars, 50);
       expect(provider.isLevelUnlocked(50), isTrue);
     });
 
@@ -37,13 +38,14 @@ void main() {
       expect(provider.isSudokuLevelUnlocked(20), isFalse);
 
       await provider.completeSudokuLevel(1, 150);
+      expect(provider.sudokuStars, 150);
       expect(provider.totalStars, 150);
 
-      expect(provider.canAffordUnlock(20), isTrue);
+      expect(provider.canAffordSudokuUnlock(20), isTrue);
 
       final success = await provider.unlockSudokuLevelWithStars(20);
       expect(success, isTrue);
-      expect(provider.totalStars, 50);
+      expect(provider.sudokuStars, 50);
       expect(provider.isSudokuLevelUnlocked(20), isTrue);
     });
 
@@ -52,13 +54,14 @@ void main() {
       expect(provider.isCryptogramLevelUnlocked(15), isFalse);
 
       await provider.completeCryptogramLevel(1, 100);
+      expect(provider.cryptogramStars, 100);
       expect(provider.totalStars, 100);
 
-      expect(provider.canAffordUnlock(15), isTrue);
+      expect(provider.canAffordCryptogramUnlock(15), isTrue);
 
       final success = await provider.unlockCryptogramLevelWithStars(15);
       expect(success, isTrue);
-      expect(provider.totalStars, 25);
+      expect(provider.cryptogramStars, 25);
       expect(provider.isCryptogramLevelUnlocked(15), isTrue);
     });
 
@@ -67,14 +70,50 @@ void main() {
       expect(provider.isQuadsumLevelUnlocked(25), isFalse);
 
       await provider.completeQuadsumLevel(1, 200);
+      expect(provider.quadsumStars, 200);
       expect(provider.totalStars, 200);
 
-      expect(provider.canAffordUnlock(25), isTrue); // 25 * 5 = 125
+      expect(provider.canAffordQuadsumUnlock(25), isTrue); // 25 * 5 = 125
 
       final success = await provider.unlockQuadsumLevelWithStars(25);
       expect(success, isTrue);
-      expect(provider.totalStars, 75); // 200 - 125
+      expect(provider.quadsumStars, 75); // 200 - 125
       expect(provider.isQuadsumLevelUnlocked(25), isTrue);
+    });
+
+    test('stars won from one game cannot unlock levels in another game', () async {
+      final provider = ProgressProvider();
+
+      // Earn 500 stars in Word Search
+      await provider.completeLevel(1, 500);
+      expect(provider.wordSearchStars, 500);
+      expect(provider.sudokuStars, 0);
+      expect(provider.cryptogramStars, 0);
+      expect(provider.quadsumStars, 0);
+
+      // Try unlocking level 10 in Sudoku (requires 50 stars) -> should FAIL
+      expect(provider.canAffordSudokuUnlock(10), isFalse);
+      final sudokuSuccess = await provider.unlockSudokuLevelWithStars(10);
+      expect(sudokuSuccess, isFalse);
+      expect(provider.isSudokuLevelUnlocked(10), isFalse);
+
+      // Try unlocking level 10 in Cryptogram -> should FAIL
+      expect(provider.canAffordCryptogramUnlock(10), isFalse);
+      final cryptoSuccess = await provider.unlockCryptogramLevelWithStars(10);
+      expect(cryptoSuccess, isFalse);
+      expect(provider.isCryptogramLevelUnlocked(10), isFalse);
+
+      // Try unlocking level 10 in Quadsum -> should FAIL
+      expect(provider.canAffordQuadsumUnlock(10), isFalse);
+      final quadSuccess = await provider.unlockQuadsumLevelWithStars(10);
+      expect(quadSuccess, isFalse);
+      expect(provider.isQuadsumLevelUnlocked(10), isFalse);
+
+      // Word search level 10 CAN be unlocked
+      expect(provider.canAffordUnlock(10), isTrue);
+      final wsSuccess = await provider.unlockLevelWithStars(10);
+      expect(wsSuccess, isTrue);
+      expect(provider.wordSearchStars, 450);
     });
   });
 

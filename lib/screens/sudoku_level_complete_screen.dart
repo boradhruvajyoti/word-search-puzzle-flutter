@@ -166,7 +166,7 @@ class _SudokuLevelCompleteScreenState extends State<SudokuLevelCompleteScreen>
                       ),
                       _InfoChip(
                         label: 'Total Stars',
-                        value: '${progress.totalStars}',
+                        value: '${progress.sudokuStars}',
                         icon: Icons.stars_rounded,
                         isDark: isDark,
                       ),

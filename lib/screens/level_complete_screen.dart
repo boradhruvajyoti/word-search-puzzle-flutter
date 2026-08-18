@@ -151,7 +151,7 @@ class _LevelCompleteScreenState extends State<LevelCompleteScreen>
                       ),
                       _InfoChip(
                         label: 'Total Stars',
-                        value: '${progress.totalStars}',
+                        value: '${progress.wordSearchStars}',
                         icon: Icons.stars_rounded,
                         isDark: isDark,
                       ),

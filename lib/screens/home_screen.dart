@@ -61,7 +61,12 @@ class _HomeScreenState extends State<HomeScreen>
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final progress = context.watch<ProgressProvider>();
 
-    final currentStars = progress.totalStars;
+    final currentStars = switch (_selectedSection) {
+      GameSection.wordSearch => progress.wordSearchStars,
+      GameSection.sudoku => progress.sudokuStars,
+      GameSection.cryptogram => progress.cryptogramStars,
+      GameSection.quadsum => progress.quadsumStars,
+    };
     final currentLevel = switch (_selectedSection) {
       GameSection.wordSearch => progress.highestUnlockedLevel,
       GameSection.sudoku => progress.sudokuHighestUnlockedLevel,
@@ -70,339 +75,432 @@ class _HomeScreenState extends State<HomeScreen>
     };
 
     return Scaffold(
-      body: SafeArea(
-        child: Stack(
-          children: [
-            // Decorative background blobs
-            _buildBg(isDark, _selectedSection),
-            // Main content
-            SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.symmetric(horizontal: 18),
-              child: Column(
-                children: [
-                  const SizedBox(height: 8),
-                  // Top Header Row
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      // Total Stars Badge
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 14, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: isDark
-                              ? const Color(0xFF1A1B2E)
-                              : const Color(0xFFFFFFFF),
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.06),
-                              blurRadius: 10,
-                              offset: const Offset(0, 3),
-                            ),
-                          ],
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(Icons.star_rounded,
-                                color: Color(0xFFFFBE0B), size: 22),
-                            const SizedBox(width: 6),
-                            Text(
-                              '$currentStars',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w800,
-                                color: isDark
-                                    ? const Color(0xFFE8E9FF)
-                                    : const Color(0xFF1A1B2E),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      // Centered Title with Logo
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: isDark
+                ? const [
+                    Color(0xFF0F1020),
+                    Color(0xFF16172E),
+                  ]
+                : const [
+                    Color(0xFFFAFBFD),
+                    Color(0xFFEEF2F8),
+                  ],
+          ),
+        ),
+        child: SafeArea(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: constraints.maxHeight,
+                  ),
+                  child: IntrinsicHeight(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 18),
+                      child: Column(
                         children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(7),
-                            child: Image.asset(
-                              'assets/icon/icon.png',
-                              width: 30,
-                              height: 30,
-                              fit: BoxFit.contain,
+                          const SizedBox(height: 6),
+                          // Top Bar: Stars Badge on left, Settings on right
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              // Total Stars Badge
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 14, vertical: 8),
+                                decoration: BoxDecoration(
+                                  color: isDark
+                                      ? const Color(0xFF1A1B2E)
+                                      : const Color(0xFFFFFFFF),
+                                  borderRadius: BorderRadius.circular(20),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black
+                                          .withValues(alpha: isDark ? 0.2 : 0.05),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(Icons.star_rounded,
+                                        color: Color(0xFFFFBE0B), size: 22),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      '$currentStars',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w800,
+                                        color: isDark
+                                            ? const Color(0xFFE8E9FF)
+                                            : const Color(0xFF1A1B2E),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              // Settings Button
+                              IconButton(
+                                icon: const Icon(Icons.settings_rounded),
+                                iconSize: 28,
+                                color: isDark
+                                    ? const Color(0xFF8B84FF)
+                                    : const Color(0xFF6C63FF),
+                                onPressed: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (_) => const SettingsScreen()),
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          const SizedBox(height: 4),
+
+                          // Top Center Logo & App Title
+                          Center(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(16),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withValues(
+                                            alpha: isDark ? 0.3 : 0.08),
+                                        blurRadius: 12,
+                                        offset: const Offset(0, 4),
+                                      ),
+                                    ],
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(16),
+                                    child: Image.asset(
+                                      'assets/icon/icon.png',
+                                      width: 52,
+                                      height: 52,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'Classic Puzzle',
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.w900,
+                                    letterSpacing: -0.3,
+                                    color: isDark
+                                        ? const Color(0xFFE8E9FF)
+                                        : const Color(0xFF1A1B2E),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Classic Puzzle',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w900,
-                              color: isDark
-                                  ? const Color(0xFFE8E9FF)
-                                  : const Color(0xFF1A1B2E),
-                            ),
+
+                          // Spacer to center game cards vertically
+                          const Spacer(),
+                          const SizedBox(height: 14),
+
+                          // Centered 2-Column Game Selection Cards (Row 1: Word Search, Sudoku)
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _GameCard(
+                                  title: 'Word Search',
+                                  subtitle: 'Find hidden words',
+                                  icon: Icons.search_rounded,
+                                  level: progress.highestUnlockedLevel,
+                                  stars: progress.wordSearchStars,
+                                  gradientColors: const [
+                                    Color(0xFF6C63FF),
+                                    Color(0xFF00C9A7),
+                                  ],
+                                  isSelected:
+                                      _selectedSection == GameSection.wordSearch,
+                                  isDark: isDark,
+                                  onTap: () {
+                                    if (_selectedSection ==
+                                        GameSection.wordSearch) {
+                                      _handlePlay(
+                                          context,
+                                          progress,
+                                          progress.highestUnlockedLevel);
+                                    } else {
+                                      _selectSection(GameSection.wordSearch);
+                                    }
+                                  },
+                                ),
+                              ),
+                              const SizedBox(width: 14),
+                              Expanded(
+                                child: _GameCard(
+                                  title: 'Sudoku',
+                                  subtitle: '9×9 number grid',
+                                  icon: Icons.grid_4x4_rounded,
+                                  level: progress.sudokuHighestUnlockedLevel,
+                                  stars: progress.sudokuStars,
+                                  gradientColors: const [
+                                    Color(0xFF3A86FF),
+                                    Color(0xFF6C63FF),
+                                  ],
+                                  isSelected:
+                                      _selectedSection == GameSection.sudoku,
+                                  isDark: isDark,
+                                  onTap: () {
+                                    if (_selectedSection == GameSection.sudoku) {
+                                      _handlePlay(
+                                          context,
+                                          progress,
+                                          progress.sudokuHighestUnlockedLevel);
+                                    } else {
+                                      _selectSection(GameSection.sudoku);
+                                    }
+                                  },
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                      // Settings Button
-                      IconButton(
-                        icon: const Icon(Icons.settings_rounded),
-                        iconSize: 28,
-                        color: isDark
-                            ? const Color(0xFF8B84FF)
-                            : const Color(0xFF6C63FF),
-                        onPressed: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) => const SettingsScreen()),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
+                          const SizedBox(height: 14),
 
-                  // 2-Column Game Selection Cards (Row 1: Word Search, Sudoku)
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _GameCard(
-                          title: 'Word Search',
-                          subtitle: 'Find hidden words',
-                          icon: Icons.search_rounded,
-                          level: progress.highestUnlockedLevel,
-                          gradientColors: const [
-                            Color(0xFF6C63FF),
-                            Color(0xFF00C9A7),
-                          ],
-                          isSelected: _selectedSection == GameSection.wordSearch,
-                          isDark: isDark,
-                          onTap: () {
-                            if (_selectedSection == GameSection.wordSearch) {
-                              _handlePlay(context, progress, progress.highestUnlockedLevel);
-                            } else {
-                              _selectSection(GameSection.wordSearch);
-                            }
-                          },
-                        ),
-                      ),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: _GameCard(
-                          title: 'Sudoku',
-                          subtitle: '9×9 number grid',
-                          icon: Icons.grid_4x4_rounded,
-                          level: progress.sudokuHighestUnlockedLevel,
-                          gradientColors: const [
-                            Color(0xFF3A86FF),
-                            Color(0xFF6C63FF),
-                          ],
-                          isSelected: _selectedSection == GameSection.sudoku,
-                          isDark: isDark,
-                          onTap: () {
-                            if (_selectedSection == GameSection.sudoku) {
-                              _handlePlay(context, progress, progress.sudokuHighestUnlockedLevel);
-                            } else {
-                              _selectSection(GameSection.sudoku);
-                            }
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 14),
+                          // Centered 2-Column Game Selection Cards (Row 2: Cryptogram, Quadsum)
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _GameCard(
+                                  title: 'Cryptogram',
+                                  subtitle: 'Decipher quotes',
+                                  icon: Icons.psychology_rounded,
+                                  level: progress.cryptogramHighestUnlockedLevel,
+                                  stars: progress.cryptogramStars,
+                                  gradientColors: const [
+                                    Color(0xFF8338EC),
+                                    Color(0xFFFF006E),
+                                  ],
+                                  isSelected:
+                                      _selectedSection == GameSection.cryptogram,
+                                  isDark: isDark,
+                                  onTap: () {
+                                    if (_selectedSection ==
+                                        GameSection.cryptogram) {
+                                      _handlePlay(
+                                          context,
+                                          progress,
+                                          progress
+                                              .cryptogramHighestUnlockedLevel);
+                                    } else {
+                                      _selectSection(GameSection.cryptogram);
+                                    }
+                                  },
+                                ),
+                              ),
+                              const SizedBox(width: 14),
+                              Expanded(
+                                child: _GameCard(
+                                  title: 'Quadsum',
+                                  subtitle: 'Quadrant sums',
+                                  icon: Icons.calculate_rounded,
+                                  level: progress.quadsumHighestUnlockedLevel,
+                                  stars: progress.quadsumStars,
+                                  gradientColors: const [
+                                    Color(0xFF00B4D8),
+                                    Color(0xFF06D6A0),
+                                  ],
+                                  isSelected:
+                                      _selectedSection == GameSection.quadsum,
+                                  isDark: isDark,
+                                  onTap: () {
+                                    if (_selectedSection ==
+                                        GameSection.quadsum) {
+                                      _handlePlay(
+                                          context,
+                                          progress,
+                                          progress
+                                              .quadsumHighestUnlockedLevel);
+                                    } else {
+                                      _selectSection(GameSection.quadsum);
+                                    }
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
 
-                  // 2-Column Game Selection Cards (Row 2: Cryptogram, Quadsum)
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _GameCard(
-                          title: 'Cryptogram',
-                          subtitle: 'Decipher quotes',
-                          icon: Icons.psychology_rounded,
-                          level: progress.cryptogramHighestUnlockedLevel,
-                          gradientColors: const [
-                            Color(0xFF8338EC),
-                            Color(0xFFFF006E),
-                          ],
-                          isSelected: _selectedSection == GameSection.cryptogram,
-                          isDark: isDark,
-                          onTap: () {
-                            if (_selectedSection == GameSection.cryptogram) {
-                              _handlePlay(context, progress, progress.cryptogramHighestUnlockedLevel);
-                            } else {
-                              _selectSection(GameSection.cryptogram);
-                            }
-                          },
-                        ),
-                      ),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: _GameCard(
-                          title: 'Quadsum',
-                          subtitle: 'Quadrant sums',
-                          icon: Icons.calculate_rounded,
-                          level: progress.quadsumHighestUnlockedLevel,
-                          gradientColors: const [
-                            Color(0xFF00B4D8),
-                            Color(0xFF06D6A0),
-                          ],
-                          isSelected: _selectedSection == GameSection.quadsum,
-                          isDark: isDark,
-                          onTap: () {
-                            if (_selectedSection == GameSection.quadsum) {
-                              _handlePlay(context, progress, progress.quadsumHighestUnlockedLevel);
-                            } else {
-                              _selectSection(GameSection.quadsum);
-                            }
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
+                          const SizedBox(height: 12),
 
-                  const SizedBox(height: 14),
-
-                  // Animated Game Info Banner for Selected Game
-                  FadeTransition(
-                    opacity: _logoFade,
-                    child: ScaleTransition(
-                      scale: _logoScale,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        decoration: BoxDecoration(
-                          color: isDark
-                              ? const Color(0xFF141526)
-                              : const Color(0xFFF1F5F9),
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              switch (_selectedSection) {
-                                GameSection.wordSearch => Icons.search_rounded,
-                                GameSection.sudoku => Icons.grid_4x4_rounded,
-                                GameSection.cryptogram => Icons.psychology_rounded,
-                                GameSection.quadsum => Icons.calculate_rounded,
-                              },
-                              color: switch (_selectedSection) {
-                                GameSection.wordSearch => const Color(0xFF6C63FF),
-                                GameSection.sudoku => const Color(0xFF3A86FF),
-                                GameSection.cryptogram => const Color(0xFF8338EC),
-                                GameSection.quadsum => const Color(0xFF00B4D8),
-                              },
-                              size: 24,
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Text(
-                                switch (_selectedSection) {
-                                  GameSection.wordSearch =>
-                                    'Swipe letters horizontally, vertically, or diagonally.',
-                                  GameSection.sudoku =>
-                                    'Fill the 9×9 grid without repeating numbers in rows, cols, or 3×3s.',
-                                  GameSection.cryptogram =>
-                                    'Decipher famous quotes and timeless wisdom letter by letter.',
-                                  GameSection.quadsum =>
-                                    'Place digits 1–9 so all 4 intersection circle sums match.',
-                                },
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: isDark ? Colors.white70 : const Color(0xFF4A4B6E),
-                                  fontWeight: FontWeight.w500,
+                          // Animated Game Info Banner for Selected Game
+                          FadeTransition(
+                            opacity: _logoFade,
+                            child: ScaleTransition(
+                              scale: _logoScale,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 10),
+                                decoration: BoxDecoration(
+                                  color: isDark
+                                      ? const Color(0xFF141526)
+                                      : const Color(0xFFFFFFFF),
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(
+                                    color: isDark
+                                        ? const Color(0xFF2E3150)
+                                        : const Color(0xFFE2E8F0),
+                                    width: 1,
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withValues(
+                                          alpha: isDark ? 0.15 : 0.04),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      switch (_selectedSection) {
+                                        GameSection.wordSearch =>
+                                          Icons.search_rounded,
+                                        GameSection.sudoku =>
+                                          Icons.grid_4x4_rounded,
+                                        GameSection.cryptogram =>
+                                          Icons.psychology_rounded,
+                                        GameSection.quadsum =>
+                                          Icons.calculate_rounded,
+                                      },
+                                      color: switch (_selectedSection) {
+                                        GameSection.wordSearch =>
+                                          const Color(0xFF6C63FF),
+                                        GameSection.sudoku =>
+                                          const Color(0xFF3A86FF),
+                                        GameSection.cryptogram =>
+                                          const Color(0xFF8338EC),
+                                        GameSection.quadsum =>
+                                          const Color(0xFF00B4D8),
+                                      },
+                                      size: 22,
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Expanded(
+                                      child: Text(
+                                        switch (_selectedSection) {
+                                          GameSection.wordSearch =>
+                                            'Swipe letters horizontally, vertically, or diagonally.',
+                                          GameSection.sudoku =>
+                                            'Fill the 9×9 grid without repeating numbers.',
+                                          GameSection.cryptogram =>
+                                            'Decipher quotes and timeless wisdom letter by letter.',
+                                          GameSection.quadsum =>
+                                            'Place digits 1–9 so all 4 quadrant sums match.',
+                                        },
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: isDark
+                                              ? Colors.white70
+                                              : const Color(0xFF4A4B6E),
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+
+                          // Spacer to position action buttons at the bottom
+                          const Spacer(),
+                          const SizedBox(height: 16),
+
+                          // Action Buttons at the Bottom
+                          _GradientButton(
+                            label: 'Play Level $currentLevel',
+                            icon: Icons.play_arrow_rounded,
+                            gradientColors: switch (_selectedSection) {
+                              GameSection.wordSearch => const [
+                                  Color(0xFF6C63FF),
+                                  Color(0xFF00C9A7)
+                                ],
+                              GameSection.sudoku => const [
+                                  Color(0xFF3A86FF),
+                                  Color(0xFF6C63FF)
+                                ],
+                              GameSection.cryptogram => const [
+                                  Color(0xFF8338EC),
+                                  Color(0xFFFF006E)
+                                ],
+                              GameSection.quadsum => const [
+                                  Color(0xFF00B4D8),
+                                  Color(0xFF06D6A0)
+                                ],
+                            },
+                            onTap: () =>
+                                _handlePlay(context, progress, currentLevel),
+                          ),
+                          const SizedBox(height: 10),
+                          _OutlinedActionButton(
+                            label: '1,000 Levels',
+                            icon: Icons.grid_view_rounded,
+                            color: switch (_selectedSection) {
+                              GameSection.wordSearch => const Color(0xFF6C63FF),
+                              GameSection.sudoku => const Color(0xFF3A86FF),
+                              GameSection.cryptogram => const Color(0xFF8338EC),
+                              GameSection.quadsum => const Color(0xFF00B4D8),
+                            },
+                            onTap: () {
+                              switch (_selectedSection) {
+                                case GameSection.wordSearch:
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (_) =>
+                                            const LevelSelectScreen()),
+                                  );
+                                case GameSection.sudoku:
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (_) =>
+                                            const SudokuLevelSelectScreen()),
+                                  );
+                                case GameSection.cryptogram:
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (_) =>
+                                            const CryptogramLevelSelectScreen()),
+                                  );
+                                case GameSection.quadsum:
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (_) =>
+                                            const QuadsumLevelSelectScreen()),
+                                  );
+                              }
+                            },
+                            isDark: isDark,
+                          ),
+                          const SizedBox(height: 12),
+                        ],
                       ),
                     ),
                   ),
-
-                  const SizedBox(height: 18),
-
-                  // Play & Levels Action Buttons
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: Column(
-                      children: [
-                        _GradientButton(
-                          label: 'Play Level $currentLevel',
-                          icon: Icons.play_arrow_rounded,
-                          gradientColors: switch (_selectedSection) {
-                            GameSection.wordSearch => const [
-                                Color(0xFF6C63FF),
-                                Color(0xFF00C9A7)
-                              ],
-                            GameSection.sudoku => const [
-                                Color(0xFF3A86FF),
-                                Color(0xFF6C63FF)
-                              ],
-                            GameSection.cryptogram => const [
-                                Color(0xFF8338EC),
-                                Color(0xFFFF006E)
-                              ],
-                            GameSection.quadsum => const [
-                                Color(0xFF00B4D8),
-                                Color(0xFF06D6A0)
-                              ],
-                          },
-                          onTap: () => _handlePlay(context, progress, currentLevel),
-                        ),
-                        const SizedBox(height: 12),
-                        _OutlinedActionButton(
-                          label: '1,000 Levels',
-                          icon: Icons.grid_view_rounded,
-                          color: switch (_selectedSection) {
-                            GameSection.wordSearch => const Color(0xFF6C63FF),
-                            GameSection.sudoku => const Color(0xFF3A86FF),
-                            GameSection.cryptogram => const Color(0xFF8338EC),
-                            GameSection.quadsum => const Color(0xFF00B4D8),
-                          },
-                          onTap: () {
-                            switch (_selectedSection) {
-                              case GameSection.wordSearch:
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (_) => const LevelSelectScreen()),
-                                );
-                              case GameSection.sudoku:
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (_) =>
-                                          const SudokuLevelSelectScreen()),
-                                );
-                              case GameSection.cryptogram:
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (_) =>
-                                          const CryptogramLevelSelectScreen()),
-                                );
-                              case GameSection.quadsum:
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (_) =>
-                                          const QuadsumLevelSelectScreen()),
-                                );
-                            }
-                          },
-                          isDark: isDark,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                ],
-              ),
-            ),
-          ],
+                ),
+              );
+            },
+          ),
         ),
       ),
     );
@@ -503,53 +601,6 @@ class _HomeScreenState extends State<HomeScreen>
       ..reset()
       ..forward();
   }
-
-  Widget _buildBg(bool isDark, GameSection section) {
-    final c1 = switch (section) {
-      GameSection.wordSearch =>
-        isDark ? const Color(0xFF8B84FF) : const Color(0xFF6C63FF),
-      GameSection.sudoku => const Color(0xFF3A86FF),
-      GameSection.cryptogram =>
-        isDark ? const Color(0xFF8338EC) : const Color(0xFF7209B7),
-      GameSection.quadsum =>
-        isDark ? const Color(0xFF00B4D8) : const Color(0xFF0077B6),
-    };
-    final c2 = switch (section) {
-      GameSection.wordSearch =>
-        isDark ? const Color(0xFF00E5BE) : const Color(0xFF00C9A7),
-      GameSection.sudoku =>
-        isDark ? const Color(0xFF8B84FF) : const Color(0xFF6C63FF),
-      GameSection.cryptogram => const Color(0xFFFF006E),
-      GameSection.quadsum => const Color(0xFF06D6A0),
-    };
-
-    return Positioned.fill(
-      child: IgnorePointer(
-        child: Stack(
-          children: [
-            Positioned(
-              top: -60,
-              left: -60,
-              child: _Blob(
-                color: c1,
-                size: 220,
-                opacity: 0.12,
-              ),
-            ),
-            Positioned(
-              bottom: -80,
-              right: -60,
-              child: _Blob(
-                color: c2,
-                size: 260,
-                opacity: 0.10,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }
 
 // ── 2-Column Game Card ────────────────────────────────────────────────────────
@@ -559,6 +610,7 @@ class _GameCard extends StatelessWidget {
   final String subtitle;
   final IconData icon;
   final int level;
+  final int stars;
   final List<Color> gradientColors;
   final bool isSelected;
   final bool isDark;
@@ -569,6 +621,7 @@ class _GameCard extends StatelessWidget {
     required this.subtitle,
     required this.icon,
     required this.level,
+    required this.stars,
     required this.gradientColors,
     required this.isSelected,
     required this.isDark,
@@ -615,7 +668,7 @@ class _GameCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Top Row: Icon + Level Badge
+            // Top Row: Icon + Star Count Badge
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -642,23 +695,39 @@ class _GameCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: primary.withValues(alpha: isDark ? 0.25 : 0.15),
+                    color: const Color(0xFFFFBE0B)
+                        .withValues(alpha: isDark ? 0.22 : 0.14),
                     borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Text(
-                    'Lvl $level',
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w800,
-                      color: isDark ? Colors.white : primary,
+                    border: Border.all(
+                      color: const Color(0xFFFFBE0B)
+                          .withValues(alpha: isDark ? 0.35 : 0.25),
+                      width: 1,
                     ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.star_rounded,
+                          color: Color(0xFFFFBE0B), size: 14),
+                      const SizedBox(width: 3),
+                      Text(
+                        '$stars',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
+                          color: isDark
+                              ? const Color(0xFFFFD166)
+                              : const Color(0xFFB7791F),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 12),
 
-            // Bottom Column: Title + Subtitle
+            // Bottom Column: Title + Subtitle with Level
             Text(
               title,
               maxLines: 1,
@@ -673,7 +742,7 @@ class _GameCard extends StatelessWidget {
             ),
             const SizedBox(height: 2),
             Text(
-              subtitle,
+              'Lvl $level • $subtitle',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
@@ -689,26 +758,6 @@ class _GameCard extends StatelessWidget {
   }
 }
 
-class _Blob extends StatelessWidget {
-  final Color color;
-  final double size;
-  final double opacity;
-
-  const _Blob(
-      {required this.color, required this.size, required this.opacity});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: color.withValues(alpha: opacity),
-      ),
-    );
-  }
-}
 
 class _GradientButton extends StatelessWidget {
   final String label;

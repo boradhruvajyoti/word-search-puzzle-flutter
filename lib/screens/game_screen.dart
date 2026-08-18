@@ -213,7 +213,7 @@ class _StarInfoBar extends StatelessWidget {
               const Icon(Icons.stars_rounded, color: Color(0xFFFFBE0B), size: 18),
               const SizedBox(width: 4),
               Text(
-                '${progress.totalStars}',
+                '${progress.wordSearchStars}',
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w800,

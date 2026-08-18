@@ -61,7 +61,7 @@ class QuadsumLevelSelectScreen extends StatelessWidget {
                           color: Color(0xFFFFBE0B), size: 18),
                       const SizedBox(width: 4),
                       Text(
-                        '${progress.totalStars} Stars',
+                        '${progress.quadsumStars} Stars',
                         style: TextStyle(
                           fontWeight: FontWeight.w700,
                           fontSize: 13,
@@ -132,7 +132,7 @@ class QuadsumLevelSelectScreen extends StatelessWidget {
   Future<void> _showUnlockDialog(BuildContext context, int level) async {
     final progress = context.read<ProgressProvider>();
     final cost = ProgressProvider.starCostToUnlock(level);
-    final canAfford = progress.canAffordUnlock(level);
+    final canAfford = progress.canAffordQuadsumUnlock(level);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final confirmed = await showDialog<bool>(
@@ -140,7 +140,7 @@ class QuadsumLevelSelectScreen extends StatelessWidget {
       builder: (ctx) => UnlockLevelDialog(
         level: level,
         cost: cost,
-        currentStars: progress.totalStars,
+        currentStars: progress.quadsumStars,
         canAfford: canAfford,
         isDark: isDark,
       ),

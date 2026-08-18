@@ -60,7 +60,7 @@ class LevelSelectScreen extends StatelessWidget {
                           color: Color(0xFFFFBE0B), size: 18),
                       const SizedBox(width: 4),
                       Text(
-                        '${progress.totalStars} Stars',
+                        '${progress.wordSearchStars} Stars',
                         style: TextStyle(
                           fontWeight: FontWeight.w700,
                           fontSize: 13,
@@ -143,7 +143,7 @@ class LevelSelectScreen extends StatelessWidget {
       builder: (ctx) => UnlockLevelDialog(
         level: level,
         cost: cost,
-        currentStars: progress.totalStars,
+        currentStars: progress.wordSearchStars,
         canAfford: canAfford,
         isDark: isDark,
       ),

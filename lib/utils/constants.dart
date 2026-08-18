@@ -25,6 +25,10 @@ class AppConstants {
   static const String prefHighestLevel = 'highest_level';
   static const String prefBestTimes = 'best_times';
   static const String prefTotalStars = 'total_stars';
+  static const String prefWordSearchStars = 'word_search_stars';
+  static const String prefSudokuStars = 'sudoku_stars';
+  static const String prefCryptogramStars = 'cryptogram_stars';
+  static const String prefQuadsumStars = 'quadsum_stars';
   static const String prefSudokuHighestLevel = 'sudoku_highest_level';
   static const String prefSudokuBestTimes = 'sudoku_best_times';
   static const String prefCryptogramHighestLevel = 'cryptogram_highest_level';

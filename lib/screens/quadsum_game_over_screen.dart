@@ -179,7 +179,7 @@ class _QuadsumGameOverScreenState extends State<QuadsumGameOverScreen>
                         ),
                       ),
                       Text(
-                        '${progress.totalStars}',
+                        '${progress.quadsumStars}',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w800,
@@ -258,9 +258,7 @@ class _QuadsumGameOverScreenState extends State<QuadsumGameOverScreen>
                             Text(
                               isAdRequired
                                   ? 'Watch Ad to Retry'
-                                  : (freeRemaining > 0
-                                      ? 'Retry ($freeRemaining Free Left)'
-                                      : 'Retry Level'),
+                                  : 'Retry Level',
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 18,

@@ -586,7 +586,7 @@ class _SudokuStarInfoBar extends StatelessWidget {
                   color: Color(0xFFFFBE0B), size: 18),
               const SizedBox(width: 4),
               Text(
-                '${progress.totalStars}',
+                '${progress.sudokuStars}',
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w800,
