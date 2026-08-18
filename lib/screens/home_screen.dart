@@ -1,6 +1,6 @@
-// Screens: HomeScreen — landing screen displaying all 4 games on 2-column cards
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../logic/ad_helper.dart';
 import '../providers/progress_provider.dart';
 import '../widgets/retry_ad_dialog.dart';
 import 'cryptogram_game_screen.dart';
@@ -44,6 +44,10 @@ class _HomeScreenState extends State<HomeScreen>
       CurvedAnimation(parent: _logoController, curve: Curves.easeIn),
     );
     _logoController.forward();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      AdHelper.requestTrackingAuthorization();
+    });
   }
 
   @override
@@ -118,16 +122,31 @@ class _HomeScreenState extends State<HomeScreen>
                           ],
                         ),
                       ),
-                      // Title Text
-                      Text(
-                        'Puzzle Arcade',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w900,
-                          color: isDark
-                              ? const Color(0xFFE8E9FF)
-                              : const Color(0xFF1A1B2E),
-                        ),
+                      // Centered Title with Logo
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(7),
+                            child: Image.asset(
+                              'assets/icon/icon.png',
+                              width: 30,
+                              height: 30,
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Classic Puzzle',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w900,
+                              color: isDark
+                                  ? const Color(0xFFE8E9FF)
+                                  : const Color(0xFF1A1B2E),
+                            ),
+                          ),
+                        ],
                       ),
                       // Settings Button
                       IconButton(

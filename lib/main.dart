@@ -14,8 +14,12 @@ import 'utils/app_theme.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize ads asynchronously so app startup is never blocked
-  AdHelper.init();
+  // Initialize Google Mobile Ads SDK and start preloading ads
+  try {
+    await AdHelper.init();
+  } catch (e) {
+    debugPrint('Failed to initialize AdHelper: $e');
+  }
 
   // Lock to portrait
   try {
@@ -56,7 +60,7 @@ class WordSearchApp extends StatelessWidget {
     final progress = context.watch<ProgressProvider>();
 
     return MaterialApp(
-      title: 'Word Search Puzzle',
+      title: 'Classic Puzzle',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
