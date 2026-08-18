@@ -10,14 +10,14 @@ class AdHelper {
   static bool _isInterstitialLoading = false;
   static bool _isRewardedLoading = false;
 
-  // Official Google AdMob Test Ad Unit IDs
+  // Google AdMob Ad Unit IDs
   static String get interstitialAdUnitId {
     if (kIsWeb) return '';
     try {
       if (Platform.isAndroid) {
-        return 'ca-app-pub-3940256099942544/1033173712';
+        return 'ca-app-pub-3811425395582544/2514405666';
       } else if (Platform.isIOS) {
-        return 'ca-app-pub-3940256099942544/4411468910';
+        return 'ca-app-pub-3811425395582544/2643961275';
       }
     } catch (_) {}
     return '';
@@ -27,9 +27,9 @@ class AdHelper {
     if (kIsWeb) return '';
     try {
       if (Platform.isAndroid) {
-        return 'ca-app-pub-3940256099942544/5224354917';
+        return 'ca-app-pub-3811425395582544/5080859253';
       } else if (Platform.isIOS) {
-        return 'ca-app-pub-3940256099942544/1712485313';
+        return 'ca-app-pub-3811425395582544/6010797540';
       }
     } catch (_) {}
     return '';
