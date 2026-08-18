@@ -342,7 +342,7 @@ class _QuadsumKeypad extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 6),
-          // Row 3: Actions (Undo, Restart, Hint)
+          // Row 3: Actions (Undo, Restart)
           Row(
             children: [
               Expanded(
@@ -360,15 +360,6 @@ class _QuadsumKeypad extends StatelessWidget {
                   label: 'Restart',
                   onTap: game.restart,
                   color: const Color(0xFF6C63FF),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: _buildPillAction(
-                  icon: Icons.lightbulb_rounded,
-                  label: 'Hint',
-                  onTap: game.useHint,
-                  color: const Color(0xFFFFBE0B),
                 ),
               ),
             ],

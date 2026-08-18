@@ -396,17 +396,10 @@ class _CryptogramKeyboard extends StatelessWidget {
           // Row 2
           _buildRow(_layout[1]),
           const SizedBox(height: 4),
-          // Row 3 with Hint, Keys, Backspace
+          // Row 3 with Keys and Backspace
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Hint button
-              _SpecialKey(
-                icon: Icons.lightbulb_rounded,
-                color: const Color(0xFFFFBE0B),
-                onTap: game.useHint,
-                isDark: isDark,
-              ),
               const SizedBox(width: 4),
               ..._layout[2].map((letter) => _buildKey(letter)),
               const SizedBox(width: 4),
@@ -417,6 +410,7 @@ class _CryptogramKeyboard extends StatelessWidget {
                 onTap: game.deleteCurrentGuess,
                 isDark: isDark,
               ),
+              const SizedBox(width: 2),
             ],
           ),
         ],
