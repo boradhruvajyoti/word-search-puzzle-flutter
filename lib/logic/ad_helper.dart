@@ -79,7 +79,7 @@ class AdHelper {
     }
   }
 
-  /// Initializes the Mobile Ads SDK and preloads ads safely.
+  /// Initializes the Mobile Ads SDK with Google UMP (GDPR) consent handling.
   static Future<void> init() async {
     if (kIsWeb) return;
     try {
@@ -88,13 +88,37 @@ class AdHelper {
       }
 
       if (Platform.isAndroid || Platform.isIOS) {
-        await MobileAds.instance.initialize();
-        debugPrint('AdHelper: MobileAds initialized (useTestAds=$useTestAds)');
-        loadInterstitialAd();
-        loadRewardedAd();
+        final params = ConsentRequestParameters();
+        ConsentInformation.instance.requestConsentInfoUpdate(
+          params,
+          () async {
+            ConsentForm.loadAndShowConsentFormIfRequired((formError) async {
+              if (formError != null) {
+                debugPrint('AdHelper: UMP Consent Form error: ${formError.message}');
+              }
+              await _completeMobileAdsInit();
+            });
+          },
+          (FormError error) async {
+            debugPrint('AdHelper: UMP Consent info update failed: ${error.message}');
+            await _completeMobileAdsInit();
+          },
+        );
       }
     } catch (e) {
       debugPrint('AdHelper: failed to initialize ads: $e');
+      await _completeMobileAdsInit();
+    }
+  }
+
+  static Future<void> _completeMobileAdsInit() async {
+    try {
+      await MobileAds.instance.initialize();
+      debugPrint('AdHelper: MobileAds initialized (useTestAds=$useTestAds)');
+      loadInterstitialAd();
+      loadRewardedAd();
+    } catch (e) {
+      debugPrint('AdHelper: MobileAds.initialize failed: $e');
     }
   }
 

@@ -197,8 +197,6 @@ class _QuadsumGameOverScreenState extends State<QuadsumGameOverScreen>
                   builder: (context) {
                     final isAdRequired =
                         progress.isQuadsumRetryAdRequired(widget.level);
-                    final freeRemaining =
-                        progress.quadsumRemainingFreeAttempts(widget.level);
 
                     return GestureDetector(
                       onTap: () {

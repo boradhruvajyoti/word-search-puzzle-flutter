@@ -1,10 +1,30 @@
-// Screens: SettingsScreen — sound, theme, reset progress
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../providers/progress_provider.dart';
+import '../utils/constants.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
+
+  Future<void> _openPrivacyPolicy(BuildContext context) async {
+    final uri = Uri.parse(AppConstants.privacyPolicyUrl);
+    try {
+      if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Could not open Privacy Policy link.')),
+          );
+        }
+      }
+    } catch (_) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not open browser.')),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,6 +74,30 @@ class SettingsScreen extends StatelessWidget {
             isDark: isDark,
             trailing: const Icon(Icons.chevron_right_rounded),
             onTap: () => _confirmReset(context, progress),
+          ),
+          const SizedBox(height: 24),
+          _SectionHeader(title: 'Legal & About', isDark: isDark),
+          const SizedBox(height: 8),
+          _SettingsTile(
+            icon: Icons.privacy_tip_rounded,
+            label: 'Privacy Policy',
+            isDark: isDark,
+            trailing: const Icon(Icons.open_in_new_rounded, size: 20),
+            onTap: () => _openPrivacyPolicy(context),
+          ),
+          const SizedBox(height: 8),
+          _SettingsTile(
+            icon: Icons.info_outline_rounded,
+            label: 'App Version',
+            isDark: isDark,
+            trailing: Text(
+              '1.0.0',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: isDark ? const Color(0xFF8B84FF) : const Color(0xFF6C63FF),
+              ),
+            ),
           ),
         ],
       ),

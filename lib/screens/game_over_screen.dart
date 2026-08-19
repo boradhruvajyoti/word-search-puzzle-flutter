@@ -195,7 +195,6 @@ class _GameOverScreenState extends State<GameOverScreen>
                 Builder(
                   builder: (context) {
                     final isAdRequired = progress.isRetryAdRequired(widget.level);
-                    final freeRemaining = progress.remainingFreeAttempts(widget.level);
 
                     return GestureDetector(
                       onTap: () {

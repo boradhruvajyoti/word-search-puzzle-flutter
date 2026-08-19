@@ -8,6 +8,9 @@ class AppConstants {
   static const int maxGridSize = 10;
   static const int minGridSize = 5;
 
+  // URLs
+  static const String privacyPolicyUrl = 'https://oxomsoft.in/privacy-policy/classic-puzzle';
+
   // Animation durations
   static const Duration cellHighlightDuration = Duration(milliseconds: 100);
   static const Duration foundWordAnimDuration = Duration(milliseconds: 400);

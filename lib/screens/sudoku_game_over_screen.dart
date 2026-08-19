@@ -197,8 +197,6 @@ class _SudokuGameOverScreenState extends State<SudokuGameOverScreen>
                   builder: (context) {
                     final isAdRequired =
                         progress.isSudokuRetryAdRequired(widget.level);
-                    final freeRemaining =
-                        progress.sudokuRemainingFreeAttempts(widget.level);
 
                     return GestureDetector(
                       onTap: () {

@@ -197,8 +197,6 @@ class _CryptogramGameOverScreenState extends State<CryptogramGameOverScreen>
                   builder: (context) {
                     final isAdRequired =
                         progress.isCryptogramRetryAdRequired(widget.level);
-                    final freeRemaining =
-                        progress.cryptogramRemainingFreeAttempts(widget.level);
 
                     return GestureDetector(
                       onTap: () {
